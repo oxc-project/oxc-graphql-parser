@@ -4,6 +4,7 @@ use crate::parser::grammar::name;
 use crate::parser::grammar::selection;
 use crate::parser::grammar::ty;
 use crate::parser::grammar::value::Constness;
+use crate::parser::grammar::variable;
 use crate::Parser;
 use crate::SyntaxKind;
 use crate::TokenKind;
@@ -13,11 +14,15 @@ use crate::T;
 /// See: https://spec.graphql.org/draft/#FragmentDefinition
 ///
 /// *FragmentDefinition*:
-///     Description? **fragment** FragmentName TypeCondition Directives? SelectionSet
+///     Description? **fragment** FragmentName VariableDefinitions? TypeCondition Directives? SelectionSet
 ///
 /// The leading *Description* is only parsed when
 /// [`Parser::allow_executable_descriptions`] is enabled (2025 draft spec,
 /// accepted by graphql-js 16).
+///
+/// *VariableDefinitions* on a fragment are the "legacy fragment variables"
+/// syntax, only parsed when [`Parser::allow_legacy_fragment_variables`] is
+/// enabled (accepted by graphql-js 16's `allowLegacyFragmentVariables`).
 pub(crate) fn fragment_definition(p: &mut Parser) {
     let _g = p.start_node(SyntaxKind::FRAGMENT_DEFINITION);
 
@@ -30,6 +35,13 @@ pub(crate) fn fragment_definition(p: &mut Parser) {
     p.bump(SyntaxKind::fragment_KW);
 
     fragment_name(p);
+
+    if p.legacy_fragment_variables_allowed() {
+        if let Some(T!['(']) = p.peek() {
+            variable::variable_definitions(p);
+        }
+    }
+
     type_condition(p);
 
     if let Some(T![@]) = p.peek() {
@@ -142,5 +154,29 @@ mod test {
             panic!("expected a FragmentDefinition");
         };
         assert!(frag.description().is_some());
+    }
+
+    #[test]
+    fn it_parses_legacy_fragment_variables_when_enabled() {
+        let input = "fragment ProfilePic($size: Int = 32) on User { profilePic(size: $size) }";
+        let cst = Parser::new(input)
+            .allow_legacy_fragment_variables(true)
+            .parse();
+
+        assert_eq!(cst.errors().len(), 0);
+        let def = cst.document().definitions().next().unwrap();
+        let cst::Definition::FragmentDefinition(frag) = def else {
+            panic!("expected a FragmentDefinition");
+        };
+        assert!(frag.variable_definitions().is_some());
+    }
+
+    #[test]
+    fn it_errors_on_legacy_fragment_variables_when_disabled() {
+        // Default parser: variable definitions on a fragment are rejected.
+        let input = "fragment ProfilePic($size: Int) on User { id }";
+        let cst = Parser::new(input).parse();
+
+        assert_ne!(cst.errors().len(), 0);
     }
 }

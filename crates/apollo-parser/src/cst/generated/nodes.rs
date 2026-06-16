@@ -62,6 +62,9 @@ impl FragmentDefinition {
     pub fn fragment_name(&self) -> Option<FragmentName> {
         support::child(&self.syntax)
     }
+    pub fn variable_definitions(&self) -> Option<VariableDefinitions> {
+        support::child(&self.syntax)
+    }
     pub fn type_condition(&self) -> Option<TypeCondition> {
         support::child(&self.syntax)
     }

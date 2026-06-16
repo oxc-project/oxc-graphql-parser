@@ -99,6 +99,11 @@ pub struct Parser<'input> {
     /// variable definitions). Off by default. Enables the 2025 draft-spec
     /// syntax that graphql-js 16 accepts.
     allow_executable_descriptions: bool,
+    /// Allow variable definitions on fragment definitions
+    /// (`fragment F($x: Int) on T`). Off by default. This is the "legacy
+    /// fragment variables" syntax accepted by graphql-js 16's
+    /// `allowLegacyFragmentVariables`.
+    allow_legacy_fragment_variables: bool,
 }
 
 /// A pending token to be added to the CST - either ignored (whitespace/comment/comma) or an error.
@@ -136,6 +141,7 @@ impl<'input> Parser<'input> {
             recursion_limit: LimitTracker::new(DEFAULT_RECURSION_LIMIT),
             accept_errors: true,
             allow_executable_descriptions: false,
+            allow_legacy_fragment_variables: false,
         }
     }
 
@@ -156,6 +162,19 @@ impl<'input> Parser<'input> {
 
     pub(crate) fn executable_descriptions_allowed(&self) -> bool {
         self.allow_executable_descriptions
+    }
+
+    /// Allow variable definitions on fragment definitions
+    /// (`fragment F($x: Int) on T`). Off by default. This is the "legacy
+    /// fragment variables" syntax accepted by graphql-js 16's
+    /// `allowLegacyFragmentVariables`.
+    pub fn allow_legacy_fragment_variables(mut self, allow: bool) -> Self {
+        self.allow_legacy_fragment_variables = allow;
+        self
+    }
+
+    pub(crate) fn legacy_fragment_variables_allowed(&self) -> bool {
+        self.allow_legacy_fragment_variables
     }
 
     /// Configure the limit on the number of tokens to parse. If an input document

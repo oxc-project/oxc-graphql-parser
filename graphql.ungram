@@ -74,7 +74,7 @@ InlineFragment =
   '...' TypeCondition? Directives? SelectionSet
 
 FragmentDefinition =
-  Description? 'fragment' FragmentName TypeCondition Directives? SelectionSet
+  Description? 'fragment' FragmentName VariableDefinitions? TypeCondition Directives? SelectionSet
 
 FragmentName =
   Name
