@@ -24,8 +24,6 @@ executors:
     resource_class: windows.xlarge
     shell: powershell.exe -ExecutionPolicy Bypass
 
-# There are two workflows: lint and test.
-
 # We run `cargo clippy` for linting on
 # linux on stable rust.
 
@@ -37,14 +35,6 @@ workflows:
     jobs:
       - lint:
           name: Lint
-          matrix:
-            parameters:
-              platform: [linux]
-              rust_channel: [stable]
-  wasm:
-    jobs:
-      - wasm:
-          name: Compile to wasm (stable rust on linux)
           matrix:
             parameters:
               platform: [linux]
@@ -65,7 +55,7 @@ workflows:
             parameters:
               platform: [linux]
 
-# Details of the three jobs: lint, test and wasm
+# Job definitions.
 jobs:
   lint:
     parameters:
@@ -91,26 +81,6 @@ jobs:
       - run:
           name: Run cargo +nightly fmt check
           command: cargo +nightly fmt --all -- --check
-
-  wasm:
-    parameters:
-      rust_channel:
-        type: string
-        default: stable
-      platform:
-        type: executor
-    executor: << parameters.platform >>
-    steps:
-      - checkout
-      - install_system_deps:
-          rust_channel: << parameters.rust_channel >>
-          platform: << parameters.platform >>
-      - run:
-          name: Install wasm-pack
-          command: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      - run:
-          name: Build wasm demo
-          command: wasm-pack build --target web examples/validation-wasm-demo
 
   test:
     parameters:

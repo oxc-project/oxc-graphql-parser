@@ -1,9 +1,0 @@
-directive @foo on OBJECT
-directive @bar on OBJECT
-type Query {
-    foo: User
-}
-
-type User @foo
-
-extend type User @bar

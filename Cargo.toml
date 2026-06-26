@@ -3,8 +3,5 @@ resolver = "2"
 members = [
     "xtask/",
     "crates/apollo-parser",
-    "crates/apollo-compiler",
-    "crates/apollo-smith",
-    "fuzz", 
-    "examples/validation-wasm-demo",
+    "fuzz",
 ]

@@ -1,5 +1,0 @@
-type Query {
-  width: Int
-  img: Url
-  relationship: Person
-}

@@ -1,8 +1,0 @@
-type Query {
-  width: Int
-  img: Url
-}
-
-interface Connection {
-  relationship: Person
-}

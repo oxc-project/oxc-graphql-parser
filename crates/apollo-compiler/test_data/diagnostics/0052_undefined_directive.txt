@@ -1,8 +1,0 @@
-Error: cannot find directive `@directiveA` in this document
-   ╭─[ 0052_undefined_directive.graphql:3:17 ]
-   │
- 3 │     status: Int @directiveA
-   │                 ─────┬─────  
-   │                      ╰─────── directive not defined
-───╯
-

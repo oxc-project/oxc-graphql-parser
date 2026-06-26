@@ -1,4 +1,0 @@
-directive @example(arg: Boolean, arg: Boolean) on FIELD
-type Query {
-  x: Int
-}

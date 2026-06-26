@@ -1,7 +1,0 @@
-type Query {
-  field: Int
-}
-
-query {
-  field
-}

@@ -1,8 +1,0 @@
-Error: cannot find type `Cat` in this document
-    ╭─[ 0043_undefined_union_member.graphql:11:18 ]
-    │
- 11 │ union CatOrDog = Cat | Dog
-    │                  ─┬─  
-    │                   ╰─── not found in this scope
-────╯
-

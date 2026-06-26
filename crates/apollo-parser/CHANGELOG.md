@@ -283,7 +283,7 @@ This release removes the `Error::new` constructor. We recommend not creating ins
   Abstract Syntax Tree (AST) but is in fact not very abstract: it preserves
   text input losslessly, and all tree leaves are string-based tokens.
   This renames it to Concrete Syntax Tree (CST) and renames various APIs accordingly.
-  This leaves the name available for a new AST in apollo-compiler 1.0.
+  This leaves the name available for a future AST.
 
 # [0.6.3](https://crates.io/crates/apollo-parser/0.6.3) - 2023-10-06
 

@@ -12,13 +12,11 @@ This project is intended to house a number of tools related to the low-level
 workings of GraphQL according to the [GraphQL specification]. Nothing in
 these libraries is specific to Apollo, and can freely be used by other
 projects which need standards-compliant GraphQL tooling written in Rust. The
-following crates currently exist:
+following crate currently exists:
 
-* [**`apollo-compiler`**](crates/apollo-compiler/) - a library to manipulate, semantically analyze, and validate GraphQL schema definition and query language
-* [**`apollo-parser`**](crates/apollo-parser) - a library to parse the GraphQL (used by `apollo-compiler`)
-* [**`apollo-smith`**](crates/apollo-smith) - a test case generator to deterministically produce arbitrary GraphQL documents
+* [**`apollo-parser`**](crates/apollo-parser) - a library to parse GraphQL
 
-Please check out their respective READMEs for usage examples.
+Please check out its README for usage examples.
 
 ## Status
 `apollo-rs` is a living project that keeps evolving and is being used in production.

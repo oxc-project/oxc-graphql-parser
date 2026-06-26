@@ -1,6 +1,0 @@
-type Query {
-    name: String
-    status: Int @directiveA
-}
-
-directive @directiveB on FIELD_DEFINITION
