@@ -23,16 +23,13 @@ use std::fmt;
 ///
 /// ### Diagnostics
 ///
-/// Using something like [miette crate] along with `oxc-graphql-parser` lets you have
-/// more visual diagnostics. [miette] and [annotate_snippets] examples guide you
+/// Using something like [ariadne] along with `oxc-graphql-parser` lets you have
+/// more visual diagnostics. [ariadne] and [annotate_snippets] examples guide you
 /// through integrating them with `oxc-graphql-parser`. These are useful if you are
 /// displaying Errors in a terminal-like environment.
 ///
-/// <img src="https://raw.githubusercontent.com/oxc-project/oxc-graphql-parser/main/crates/oxc_graphql_parser/screenshots/oxc_graphql_parser_error.png" alt="A screenshot of an error example produced by using oxc-graphql-parser and miette. The ascii display shows a graphql code snippet with line numbers to the left. Under the code sample there is a line pointing to where a value is missing in graphql code">
-///
-/// [miette]: https://github.com/oxc-project/oxc-graphql-parser/blob/main/crates/oxc_graphql_parser/examples/miette.rs
+/// [ariadne]: https://github.com/oxc-project/oxc-graphql-parser/blob/main/crates/oxc_graphql_parser/examples/ariadne.rs
 /// [annotate_snippets]: https://github.com/oxc-project/oxc-graphql-parser/blob/main/crates/oxc_graphql_parser/examples/annotate_snippet.rs
-/// [miette crate]: https://docs.rs/miette/3.2.0/miette/index.html
 
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub(crate) enum ErrorData {
