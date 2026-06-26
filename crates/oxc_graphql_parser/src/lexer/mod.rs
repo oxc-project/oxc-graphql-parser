@@ -582,6 +582,7 @@ impl<'a> Cursor<'a> {
         Err(Error::with_loc("Unterminated spread operator", data.to_string(), token.index))
     }
 
+    #[inline]
     fn done(&mut self, token: Token<'a>) -> Result<Token<'a>, Error> {
         if let Some(mut err) = self.err.take() {
             err.set_data(token.data.to_string());
