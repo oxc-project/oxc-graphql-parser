@@ -119,12 +119,9 @@ impl<'a> Parser<'a> {
 
     fn parse_definition(&mut self) -> Option<Definition<'a>> {
         let description = self.parse_description_if_present();
-        let selector = match description {
-            Some(_) => self.peek_data().map(str::to_string),
-            None => self.peek_data().map(str::to_string),
-        }?;
+        let selector = self.peek_data()?;
 
-        let definition = match selector.as_str() {
+        let definition = match selector {
             "directive" => Definition::Directive(self.parse_directive_definition(description)),
             "enum" => Definition::EnumType(self.parse_enum_type_definition(description)),
             "extend" => return self.parse_extension(),
