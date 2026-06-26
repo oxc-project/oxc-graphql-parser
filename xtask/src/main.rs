@@ -31,7 +31,7 @@ struct Xtask {
 pub enum Command {
     /// Perform code generation for the parser
     Codegen(codegen::Codegen),
-    /// Check Rust code formating and run clippy
+    /// Check Rust code formatting and run clippy
     Lint,
     /// Reformat Rust code
     Fmt,
@@ -123,7 +123,7 @@ pub(crate) fn ensure_file_contents(file: &Path, contents: &str) -> Result<()> {
     }
     std::fs::write(file, contents).unwrap();
     bail!(
-        "{} was not up to date and has been updated. Make sure to re-run cargo check and cargo test to accomodate the updates.",
+        "{} was not up to date and has been updated. Make sure to re-run cargo check and cargo test to accommodate the updates.",
         file.display()
     );
 }

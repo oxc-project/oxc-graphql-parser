@@ -41,7 +41,7 @@ $env:UPDATE_EXPECT=1; cargo test --package oxc-graphql-parser
 To format your code:
 ```bash
 rustup install nightly
-rustup component add --toolchain nigthly rustfmt
+rustup component add --toolchain nightly rustfmt
 cargo +nightly fmt --all
 ```
 

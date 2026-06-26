@@ -1,0 +1,5 @@
+[files]
+extend-exclude = ["crates/oxc_graphql_parser/test_data"]
+
+[default.extend-words]
+nin = "nin"

@@ -76,6 +76,6 @@ pub(crate) fn interface_type_extension(p: &mut Parser) {
     }
 
     if !meets_requirements {
-        p.err("exptected an Implements Interfaces, Directives, or a Fields Definition");
+        p.err("expected an Implements Interfaces, Directives, or a Fields Definition");
     }
 }

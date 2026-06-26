@@ -85,7 +85,7 @@ fn dump_tokens_and_errors(text: &str) -> (String, Vec<Error>) {
 /// Compares input code taken from a `.graphql` file in test_fixtures and its
 /// expected output in the corresponding `.txt` file.
 ///
-/// The test fails if the ouptut differs.
+/// The test fails if the output differs.
 ///
 /// If a matching file does not exist, it will be created, filled with output,
 /// but fail the test.

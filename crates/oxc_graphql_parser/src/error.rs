@@ -3,7 +3,7 @@ use std::fmt;
 /// An `Error` type for operations performed in the lexer and the parser.
 ///
 /// Errors get returned alongside the resulting CST if either the lexer or the
-/// parser encouter lexical or syntactical errors respectively.
+/// parser encounters lexical or syntactical errors respectively.
 ///
 /// We encourage you to check for the CST's errors before proceeding to iterate
 /// over the CST's nodes:

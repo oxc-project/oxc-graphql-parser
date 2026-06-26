@@ -6,5 +6,5 @@
         - WHITESPACE@16..17 " "
         - NAME@17..29
             - IDENT@17..29 "ValuedEntity"
-- ERROR@29:29 "exptected an Implements Interfaces, Directives, or a Fields Definition" EOF
+- ERROR@29:29 "expected an Implements Interfaces, Directives, or a Fields Definition" EOF
 recursion limit: 500, high: 0

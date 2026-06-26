@@ -1,4 +1,5 @@
 #![doc = include_str!("../README.md")]
+#![allow(rustdoc::bare_urls, rustdoc::broken_intra_doc_links, rustdoc::invalid_rust_codeblocks)]
 
 mod lexer;
 #[cfg(test)]

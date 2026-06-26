@@ -38,6 +38,6 @@ type Query {
                 return;
             }
         }
-        panic!("object type definition has not been catched");
+        panic!("object type definition was not found");
     }
 }
