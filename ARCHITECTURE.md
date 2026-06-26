@@ -1,6 +1,6 @@
 # Architecture
 
-This document gives an overview of how `apollo-rs` works. `apollo-rs` is intended to encapsulate generic GraphQL tooling in Rust. Currently this houses [`apollo-parser`].
+This document gives an overview of how `oxc-graphql` works. `oxc-graphql` is intended to encapsulate generic GraphQL tooling in Rust.
 
 ## Design Principles
 1. **Prioritizing developer experience.** Elegant and ergonomic APIs is the
@@ -23,16 +23,16 @@ or writing out query planning and composition algorithms in Rust. These all have
 quite different requirements when it comes to document manipulation. We wanted to
 make sure we account for them early on.
 
-## `apollo-parser`
+## `oxc-graphql`
 
-`apollo-parser` is the parser crate of `apollo-rs`. Its job is to take GraphQL
+`oxc-graphql` is the parser crate in this repository. Its job is to take GraphQL
 queries or schemas as string input and produce an Concrete Syntax Tree (CST).
-Users of apollo-parser can then programmatically traverse the CST to get information
+Users of oxc-graphql can then programmatically traverse the CST to get information
 about their input.
 
-There are two main components of `apollo-parser`: the lexer and the parser.
+There are two main components of `oxc-graphql`: the lexer and the parser.
 
-`apollo-parser` is a hand-written recursive-descent parser. This is a type of
+`oxc-graphql` is a hand-written recursive-descent parser. This is a type of
 parser that starts from the top of a file and recursively walks its way down
 generating CST nodes along the way. This style of parser is common in
 industrial-strength compilers; for example, Clang and Rustc use this style of
@@ -70,7 +70,7 @@ If no error is emitted, we can be sure that the input is lexically correct!
 ### Parser
 The next step in our parsing pipeline is the parser. The parser’s job is to take the tokens produced by the lexer and create nodes with information and relationships that in the end make up a syntax tree. Much like with the lexer, the parser is error resilient. Syntactic errors, such as a missing `Name` in a `ScalarDefinition`, are added to parser’s error vector while the parser carries on parsing.
 
-![A diagram of how lexer’s tokens are arranged by the parser. On the left, different coloured boxes are stacked on top of on top of each other. These boxes represent various tokens created by the lexer. To the right, the boxes are rearranged in an upside down “tree” structure. The top of the tree is a single node. the boxes are arranged underneath the node in a top-down, left-to-right order they appear on the left. This is meant to represent the fact that the parser groups various tokens together and establishes relationships between them.](images/apollo_parser_tree_manipulation.png)
+![A diagram of how lexer’s tokens are arranged by the parser. On the left, different coloured boxes are stacked on top of on top of each other. These boxes represent various tokens created by the lexer. To the right, the boxes are rearranged in an upside down “tree” structure. The top of the tree is a single node. the boxes are arranged underneath the node in a top-down, left-to-right order they appear on the left. This is meant to represent the fact that the parser groups various tokens together and establishes relationships between them.](images/oxc_graphql_tree_manipulation.png)
 
 The parsing step is done in two parts: we first create an untyped syntax tree, then a typed one. 
 
@@ -194,8 +194,8 @@ Here is what it looks like to walk a `ScalarDefinition` and get its `Name` from
 the syntax tree using the above `name()` getter method:
 
 ```rust
-use apollo_parser::Parser;
-use apollo_parser::cst::{Definition, ObjectTypeDefinition};
+use oxc_graphql::Parser;
+use oxc_graphql::cst::{Definition, ObjectTypeDefinition};
 
 // Let's create a GraphQL document with just a scalar type definition.
 let gql = r#"scalar UUID @specifiedBy(url: "cats.com/cool-kitten-schema")"#;
@@ -216,14 +216,14 @@ for definition in document.definitions() {
 }
 ```
 
-[`apollo-parser`]: https://github.com/apollographql/apollo-rs/tree/main/crates/apollo-parser
+[`oxc-graphql`]: https://github.com/oxc-project/oxc-graphql/tree/main/crates/oxc-graphql
 [`rust-analyzer`]: https://github.com/rust-analyzer/rust-analyzer
 [`rowan`]: https://github.com/rust-analyzer/rowan
 [`ungrammar`]: https://github.com/rust-analyzer/ungrammar
-[apollo-rs: spec-compliant GraphQL tools in Rust]: https://www.apollographql.com/blog/announcement/tooling/apollo-rs-graphql-tools-in-rust/
+[oxc-graphql: spec-compliant GraphQL tools in Rust]: https://github.com/oxc-project/oxc-graphql/
 [Red/Green tree]: https://blog.yaakov.online/red-green-trees/
 [this post]: https://rust-analyzer.github.io/blog/2020/10/24/introducing-ungrammar.html
-[graphql.ungram]: https://github.com/apollographql/apollo-rs/blob/fcbf4903be261de1bf40756180f07cf339d3b2f9/graphql.ungram  
+[graphql.ungram]: https://github.com/oxc-project/oxc-graphql/blob/main/graphql.ungram
 [`xtask`]: https://github.com/matklad/cargo-xtask
-[codegen/gen_syntax_nodes]: https://github.com/apollographql/apollo-rs/blob/fcbf4903be261de1bf40756180f07cf339d3b2f9/xtask/src/codegen/gen_syntax_nodes.rs
-[codegen/gen_syntax_kinds]: https://github.com/apollographql/apollo-rs/blob/fcbf4903be261de1bf40756180f07cf339d3b2f9/xtask/src/codegen/gen_syntax_kinds.rs
+[codegen/gen_syntax_nodes]: https://github.com/oxc-project/oxc-graphql/blob/main/xtask/src/codegen/gen_syntax_nodes.rs
+[codegen/gen_syntax_kinds]: https://github.com/oxc-project/oxc-graphql/blob/main/xtask/src/codegen/gen_syntax_kinds.rs

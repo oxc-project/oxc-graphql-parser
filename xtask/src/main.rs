@@ -18,7 +18,7 @@ fn main() -> Result<()> {
 }
 
 #[derive(Debug, Parser)]
-#[clap(name = "xtask", about = "apollo-rs development workflows")]
+#[clap(name = "xtask", about = "oxc-graphql development workflows")]
 struct Xtask {
     #[clap(subcommand)]
     pub command: Command,

@@ -1,5 +1,5 @@
 <div align="center">
-  <h1><code>apollo-rs</code></h1>
+  <h1><code>oxc-graphql</code></h1>
 
   <p>
     <strong>Rust tooling for manipulation of the GraphQL language.</strong>
@@ -10,17 +10,17 @@
 
 This project is intended to house a number of tools related to the low-level
 workings of GraphQL according to the [GraphQL specification]. Nothing in
-these libraries is specific to Apollo, and can freely be used by other
-projects which need standards-compliant GraphQL tooling written in Rust. The
-following crate currently exists:
+these libraries is specific to a particular GraphQL implementation, and can
+freely be used by other projects which need standards-compliant GraphQL tooling
+written in Rust. The following crate currently exists:
 
-* [**`apollo-parser`**](crates/apollo-parser) - a library to parse GraphQL
+* [**`oxc-graphql`**](crates/oxc-graphql) - a library to parse GraphQL
 
 Please check out its README for usage examples.
 
 ## Status
-`apollo-rs` is a living project that keeps evolving and is being used in production.
-If you try out `apollo-rs` and run into trouble, we encourage you to open an [issue].
+`oxc-graphql` is a living project that keeps evolving and is being used in production.
+If you try out `oxc-graphql` and run into trouble, we encourage you to open an [issue].
 
 ## Design Principles
 1. **Prioritizing developer experience.** Elegant and ergonomic APIs is the
@@ -45,7 +45,7 @@ make sure we account for them early on.
 
 ## Rust versions
 
-`apollo-rs` is tested on the latest stable version of Rust.
+`oxc-graphql` is tested on the latest stable version of Rust.
 Older version may or may not be compatible.
 
 ## License
@@ -56,5 +56,5 @@ Licensed under either of
 
 at your option.
 
-[issue]: https://github.com/apollographql/apollo-rs/issues/new/choose
+[issue]: https://github.com/oxc-project/oxc-graphql/issues/new/choose
 [GraphQL specification]: https://spec.graphql.org/October2021

@@ -1,12 +1,12 @@
-# Contributing to `apollo-rs`
+# Contributing to `oxc-graphql`
 
-> `apollo-rs` is a project by [Apollo GraphQL] and is not currently ready for
+> `oxc-graphql` is not currently ready for
 > external feature contributors, though some documentation contributions may be
 > accepted.
 
 ## Prerequisites
 
-`apollo-rs` is written in [Rust]. In order to contribute, you'll need to have
+`oxc-graphql` is written in [Rust]. In order to contribute, you'll need to have
 Rust installed. To install Rust, visit [https://www.rust-lang.org/tools/install].
 
 Rust has a build tool and package manager called [`cargo`] that you'll use to
@@ -31,11 +31,11 @@ cargo xtask codegen
 
 To run parser and lexer tests _and_ let the testing framework make changes to the incorrect files on a unix system:
 ```bash
-env UPDATE_EXPECT=1 cargo test --package apollo-parser
+env UPDATE_EXPECT=1 cargo test --package oxc-graphql
 ```
 or the same in powershell:
 ```bash
-$env:UPDATE_EXPECT=1; cargo test --package apollo-parser
+$env:UPDATE_EXPECT=1; cargo test --package oxc-graphql
 ```
 
 To format your code:
@@ -57,7 +57,6 @@ We primarily use [VS Code] along with [rust-analyzer] when developing.
 `rust-analyzer` can also be used with [other IDEs] if you are more
 familiar with something else.
 
-[Apollo GraphQL]: https://www.apollographql.com
 [Rust]: https://www.rust-lang.org/
 [`cargo`]: https://doc.rust-lang.org/cargo/index.html
 [https://www.rust-lang.org/tools/install]: https://www.rust-lang.org/tools/install
@@ -72,20 +71,20 @@ familiar with something else.
 We work largely in public using GitHub [issues] to track work. To make sure contributions are aligned with the project's goals, keep the following issue etiquette in mind:
 
 * [Open an issue] for your contribution. If there is already an issue open, please ask if anyone is working on it or let us know you plan on working on it. This will let us know what to expect, help us to prioritize reviews, and ensure there is no duplication of work.
-* Use issue templates! These templates have been created to help minimize back-and-forth between creators and the `apollo-rs` team. They include the necessary information to help the team triage your issue or question, as well as automatically applying the appropriate labels.
-* Issues with the `triage` label still applied have not yet been reviewed by the `apollo-rs` team, and there are no guarantees that PRs fixing an untriaged issue will be accepted. It's best to wait for issues to be triaged before beginning work.
+* Use issue templates! These templates have been created to help minimize back-and-forth between creators and the `oxc-graphql` team. They include the necessary information to help the team triage your issue or question, as well as automatically applying the appropriate labels.
+* Issues with the `triage` label still applied have not yet been reviewed by the `oxc-graphql` team, and there are no guarantees that PRs fixing an untriaged issue will be accepted. It's best to wait for issues to be triaged before beginning work.
 
 ### Submitting a Pull Request
 
-Pull requests (PRs) should only be opened after discussion and consensus has been reached in a related issue, and you have communicated your intentions to create a PR with the `apollo-rs` team.
+Pull requests (PRs) should only be opened after discussion and consensus has been reached in a related issue, and you have communicated your intentions to create a PR with the `oxc-graphql` team.
 
 * When creating a PR, make sure to link it to an issue or use the `Fixes #123` syntax to make sure others know which issue(s) your PR is trying to address and to help us automatically close resolved issues.
 * Include a helpful description. It is important to provide context to reviewers that show _how_ your PR addresses an issue and any questions you still have unanswered, or portions of the code you think deserve some extra attention.
 * If your work is still in-progress and you're opening a PR to get early feedback, let us know by opening it as a draft PR and adding `wip:` prefix in the PR title.
-* Add tests for any logic changes in your code, especially if you are fixing a bug. Your PR should have no failing tests before merging. Please let us know if you need help writing tests, there are still some portions of the `apollo-rs` codebase that do not have established testing patterns.
+* Add tests for any logic changes in your code, especially if you are fixing a bug. Your PR should have no failing tests before merging. Please let us know if you need help writing tests, there are still some portions of the `oxc-graphql` codebase that do not have established testing patterns.
 
-[issues]: https://github.com/apollographql/rover/issues
-[Open an issue]: https://github.com/apollographql/rover/issues/new/choose
+[issues]: https://github.com/oxc-project/oxc-graphql/issues
+[Open an issue]: https://github.com/oxc-project/oxc-graphql/issues/new/choose
 
 
 ## Code of conduct
