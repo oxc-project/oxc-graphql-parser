@@ -1,13 +1,13 @@
+use crate::Parser;
+use crate::S;
+use crate::SyntaxKind;
+use crate::T;
+use crate::TokenKind;
 use crate::parser::grammar::description;
 use crate::parser::grammar::directive;
 use crate::parser::grammar::operation;
 use crate::parser::grammar::ty;
 use crate::parser::grammar::value::Constness;
-use crate::Parser;
-use crate::SyntaxKind;
-use crate::TokenKind;
-use crate::S;
-use crate::T;
 
 /// RootOperationTypeDefinition is used in a SchemaDefinition. Not to be confused
 /// with OperationDefinition.

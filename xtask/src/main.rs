@@ -2,15 +2,15 @@ mod codegen;
 mod cst_src;
 mod utils;
 
-use anyhow::bail;
 use anyhow::Result;
+use anyhow::bail;
 use clap::Parser;
 use clap::Subcommand;
 use std::env;
 use std::path::Path;
 use std::path::PathBuf;
-use xshell::cmd;
 use xshell::Shell;
+use xshell::cmd;
 
 fn main() -> Result<()> {
     let app = Xtask::parse();
@@ -112,7 +112,7 @@ fn reformat(text: &str) -> Result<String> {
 pub(crate) fn ensure_file_contents(file: &Path, contents: &str) -> Result<()> {
     match std::fs::read_to_string(file) {
         Ok(old_contents) if normalize_newlines(&old_contents) == normalize_newlines(contents) => {
-            return Ok(())
+            return Ok(());
         }
         _ => (),
     }
@@ -128,7 +128,10 @@ pub(crate) fn ensure_file_contents(file: &Path, contents: &str) -> Result<()> {
         let _ = std::fs::create_dir_all(parent);
     }
     std::fs::write(file, contents).unwrap();
-    bail!("{} was not up to date and has been updated. Make sure to re-run cargo check and cargo test to accomodate the updates.", file.display());
+    bail!(
+        "{} was not up to date and has been updated. Make sure to re-run cargo check and cargo test to accomodate the updates.",
+        file.display()
+    );
 }
 
 fn normalize_newlines(s: &str) -> String {

@@ -105,11 +105,11 @@
 mod generated;
 mod node_ext;
 
-pub use crate::parser::SyntaxNodePtr;
 use crate::SyntaxKind;
 pub use crate::SyntaxNode;
 use crate::SyntaxNodeChildren;
 use crate::SyntaxToken;
+pub use crate::parser::SyntaxNodePtr;
 pub use generated::nodes::*;
 use std::marker::PhantomData;
 

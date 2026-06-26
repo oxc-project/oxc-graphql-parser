@@ -2,9 +2,10 @@
 //! made in codegeneration that lives in `xtask` top-level dir.
 
 use crate::{
-    cst::{support, CstChildren, CstNode},
+    S,
     SyntaxKind::{self, *},
-    SyntaxNode, SyntaxToken, S,
+    SyntaxNode, SyntaxToken,
+    cst::{CstChildren, CstNode, support},
 };
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Name {

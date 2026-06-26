@@ -1,10 +1,10 @@
 // The testing framework in this file is pretty much entirely copied from rust-analyzer's parser and lexer tests:
 // https://github.com/rust-analyzer/rust-analyzer/blob/master/crates/syntax/src/tests.rs
 
-use crate::cst::CstNode;
 use crate::Error;
 use crate::Lexer;
 use crate::Parser;
+use crate::cst::CstNode;
 use expect_test::expect_file;
 use indexmap::IndexMap;
 use std::env;
@@ -164,7 +164,9 @@ fn graphql_files_in_dir(dir: &Path) -> Vec<PathBuf> {
 
         if let Some(existing) = seen.get(&number) {
             let suggest = dir.join(format!("{next_number:03}_{name}"));
-            panic!("Conflicting test file: {path:?} has the same number as {existing:?}. Suggested name: {suggest:?}");
+            panic!(
+                "Conflicting test file: {path:?} has the same number as {existing:?}. Suggested name: {suggest:?}"
+            );
         }
 
         seen.insert(number, path);

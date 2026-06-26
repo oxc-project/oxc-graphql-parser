@@ -1,13 +1,13 @@
+use crate::Parser;
+use crate::SyntaxKind;
+use crate::T;
+use crate::TokenKind;
 use crate::parser::grammar::description;
 use crate::parser::grammar::directive;
 use crate::parser::grammar::name;
 use crate::parser::grammar::selection;
 use crate::parser::grammar::value::Constness;
 use crate::parser::grammar::variable;
-use crate::Parser;
-use crate::SyntaxKind;
-use crate::TokenKind;
-use crate::T;
 
 /// See: https://spec.graphql.org/draft/#OperationDefinition
 ///
@@ -95,8 +95,8 @@ pub(crate) fn operation_type(p: &mut Parser) {
 
 #[cfg(test)]
 mod test {
-    use crate::cst;
     use crate::Parser;
+    use crate::cst;
 
     // NOTE @lrlna: related PR to the spec to avoid this issue:
     // https://github.com/graphql/graphql-spec/pull/892

@@ -1,8 +1,8 @@
 //! Example usage of `oxc-graphql-parser` to check for unused vars in a given GraphQL
 //! query.
 
-use oxc_graphql_parser::cst;
 use oxc_graphql_parser::Parser;
+use oxc_graphql_parser::cst;
 use std::fs;
 use std::path::Path;
 

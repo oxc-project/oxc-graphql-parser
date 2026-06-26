@@ -2,7 +2,8 @@
 name = "xtask"
 version = "0.0.1"
 publish = false
-edition = "2021"
+edition = "2024"
+rust-version = "1.96.0"
 
 [dependencies]
 anyhow = "1"

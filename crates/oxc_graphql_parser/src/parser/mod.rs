@@ -5,14 +5,14 @@ mod token_text;
 
 pub(crate) mod grammar;
 
-use crate::cst::Document;
-use crate::cst::SelectionSet;
-use crate::cst::Type;
-use crate::lexer::Lexer;
 use crate::Error;
 use crate::LimitTracker;
 use crate::Token;
 use crate::TokenKind;
+use crate::cst::Document;
+use crate::cst::SelectionSet;
+use crate::cst::Type;
+use crate::lexer::Lexer;
 pub use generated::syntax_kind::SyntaxKind;
 pub use language::SyntaxElement;
 pub use language::SyntaxNode;
@@ -645,10 +645,10 @@ impl Checkpoint {
 #[cfg(test)]
 mod tests {
     use super::DEFAULT_RECURSION_LIMIT;
-    use crate::cst;
     use crate::Error;
     use crate::Parser;
     use crate::SyntaxTree;
+    use crate::cst;
     use expect_test::expect;
 
     #[test]

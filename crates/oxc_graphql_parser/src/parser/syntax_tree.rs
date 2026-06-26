@@ -1,10 +1,10 @@
 use super::LimitTracker;
-use crate::cst;
-use crate::cst::CstNode;
 use crate::Error;
 use crate::SyntaxElement;
 use crate::SyntaxKind;
 use crate::SyntaxNode;
+use crate::cst;
+use crate::cst::CstNode;
 use rowan::GreenNode;
 use rowan::GreenNodeBuilder;
 use std::fmt;
@@ -271,8 +271,8 @@ impl SyntaxTreeBuilder {
 
 #[cfg(test)]
 mod test {
-    use crate::cst::Definition;
     use crate::Parser;
+    use crate::cst::Definition;
 
     #[test]
     fn directive_name() {

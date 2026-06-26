@@ -1,14 +1,14 @@
+use crate::Parser;
+use crate::S;
+use crate::SyntaxKind;
+use crate::T;
+use crate::TokenKind;
 use crate::parser::grammar::description;
 use crate::parser::grammar::directive;
 use crate::parser::grammar::name;
 use crate::parser::grammar::ty;
 use crate::parser::grammar::value;
 use crate::parser::grammar::value::Constness;
-use crate::Parser;
-use crate::SyntaxKind;
-use crate::TokenKind;
-use crate::S;
-use crate::T;
 use std::ops::ControlFlow;
 
 /// See: https://spec.graphql.org/October2021/#VariableDefinitions
@@ -93,8 +93,8 @@ pub(crate) fn variable(p: &mut Parser) {
 
 #[cfg(test)]
 mod test {
-    use crate::cst;
     use crate::Parser;
+    use crate::cst;
 
     #[test]
     fn it_accesses_variable_name_and_type() {

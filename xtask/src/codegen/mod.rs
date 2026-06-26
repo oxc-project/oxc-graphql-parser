@@ -190,9 +190,11 @@ fn lower_comma_list(
         _ => return false,
     };
     let (node, repeat, trailing_comma) = match rule.as_slice() {
-        [Rule::Node(node), Rule::Rep(repeat), Rule::Opt(trailing_comma)] => {
-            (node, repeat, trailing_comma)
-        }
+        [
+            Rule::Node(node),
+            Rule::Rep(repeat),
+            Rule::Opt(trailing_comma),
+        ] => (node, repeat, trailing_comma),
         _ => return false,
     };
     let repeat = match &**repeat {
@@ -309,12 +311,10 @@ fn extract_enum_traits(cst: &mut CstSrc) {
                             Some(node.traits.iter().cloned().collect::<BTreeSet<_>>())
                         })
                         .unwrap_or_else(|| {
-                            panic!("{}", {
-                                &format!(
-                                    "Could not find a struct `{}` for enum `{}::{}`",
-                                    var, enm.name, var
-                                )
-                            })
+                            panic!(
+                                "Could not find a struct `{}` for enum `{}::{}`",
+                                var, enm.name, var
+                            )
                         })
                 })
         });

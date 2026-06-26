@@ -1,3 +1,6 @@
+use crate::Parser;
+use crate::SyntaxKind;
+use crate::TokenKind;
 use crate::parser::grammar::directive;
 use crate::parser::grammar::enum_;
 use crate::parser::grammar::extensions;
@@ -9,9 +12,6 @@ use crate::parser::grammar::operation;
 use crate::parser::grammar::scalar;
 use crate::parser::grammar::schema;
 use crate::parser::grammar::union_;
-use crate::Parser;
-use crate::SyntaxKind;
-use crate::TokenKind;
 use std::ops::ControlFlow;
 
 /// See: https://spec.graphql.org/October2021/#Document
@@ -84,9 +84,9 @@ fn select_definition(def: &str, p: &mut Parser) {
 
 #[cfg(test)]
 mod test {
+    use crate::Parser;
     use crate::cst;
     use crate::cst::CstNode;
-    use crate::Parser;
 
     #[test]
     fn it_returns_the_original_source_string() {

@@ -1,10 +1,10 @@
+use crate::Parser;
+use crate::S;
+use crate::SyntaxKind;
+use crate::T;
+use crate::TokenKind;
 use crate::parser::grammar::name;
 use crate::parser::grammar::variable;
-use crate::Parser;
-use crate::SyntaxKind;
-use crate::TokenKind;
-use crate::S;
-use crate::T;
 use std::ops::ControlFlow;
 
 #[derive(Clone, Copy)]
@@ -174,9 +174,9 @@ pub(crate) fn default_value(p: &mut Parser) {
 
 #[cfg(test)]
 mod test {
+    use crate::Parser;
     use crate::cst;
     use crate::cst::CstNode;
-    use crate::Parser;
 
     #[test]
     fn it_returns_string_for_string_value_into() {

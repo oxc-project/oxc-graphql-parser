@@ -5,8 +5,8 @@ use ariadne::Label;
 use ariadne::Report;
 use ariadne::ReportKind;
 use ariadne::Source;
-use oxc_graphql_parser::cst;
 use oxc_graphql_parser::Parser;
+use oxc_graphql_parser::cst;
 use std::fs;
 use std::path::Path;
 

@@ -1,10 +1,10 @@
-use crate::parser::grammar::name;
 use crate::Parser;
+use crate::S;
 use crate::SyntaxKind;
+use crate::T;
 use crate::Token;
 use crate::TokenKind;
-use crate::S;
-use crate::T;
+use crate::parser::grammar::name;
 
 /// See: https://spec.graphql.org/October2021/#InputValueDefinition
 ///
@@ -102,9 +102,9 @@ pub(crate) fn named_type(p: &mut Parser) {
 
 #[cfg(test)]
 mod test {
+    use crate::Parser;
     use crate::cst;
     use crate::cst::CstNode;
-    use crate::Parser;
 
     #[test]
     fn it_parses_nested_wrapped_types_in_op_def_and_returns_matching_stringified_doc() {

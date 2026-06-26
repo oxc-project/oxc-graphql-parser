@@ -1,7 +1,7 @@
-use crate::cst;
-use crate::cst::CstNode;
 use crate::SyntaxNode;
 use crate::TokenText;
+use crate::cst;
+use crate::cst::CstNode;
 use rowan::GreenToken;
 use rowan::SyntaxKind;
 use std::num::ParseFloatError;

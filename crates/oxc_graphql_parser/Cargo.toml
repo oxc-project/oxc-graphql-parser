@@ -1,7 +1,8 @@
 [package]
 name = "oxc-graphql-parser"
 version = "0.0.1"
-edition = "2021"
+edition = "2024"
+rust-version = "1.96.0"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/oxc-project/oxc-graphql-parser"
 documentation = "https://docs.rs/oxc-graphql-parser"
@@ -23,9 +24,13 @@ thiserror = "2.0.0"
 [dev-dependencies]
 annotate-snippets = "0.12.0"
 ariadne = "0.6.0"
-criterion = "0.8.0"
+criterion2 = { version = "3", default-features = false }
 expect-test = "1.4"
 indexmap = "2.0.0"
+
+[features]
+default = []
+codspeed = ["criterion2/codspeed"]
 
 [[bench]]
 name = "query"

@@ -1,6 +1,6 @@
 use criterion::*;
-use oxc_graphql_parser::cst;
 use oxc_graphql_parser::Lexer;
+use oxc_graphql_parser::cst;
 
 fn parse_query(query: &str) {
     let parser = oxc_graphql_parser::Parser::new(query);

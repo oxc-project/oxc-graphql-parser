@@ -3,9 +3,9 @@ mod lookup;
 mod token;
 mod token_kind;
 
-use crate::lexer::cursor::Cursor;
 use crate::Error;
 use crate::LimitTracker;
+use crate::lexer::cursor::Cursor;
 pub use token::Token;
 pub use token_kind::TokenKind;
 
@@ -446,7 +446,7 @@ impl<'a> Cursor<'a> {
                             format!("Unexpected character `{c}`, expected exponent digit or sign"),
                             self.current_str().to_string(),
                             token.index,
-                        ))
+                        ));
                     }
                 },
                 State::ExponentSign => match c {
@@ -458,7 +458,7 @@ impl<'a> Cursor<'a> {
                             format!("Unexpected character `{c}`, expected exponent digit"),
                             self.current_str().to_string(),
                             token.index,
-                        ))
+                        ));
                     }
                 },
                 State::ExponentDigit => match c {
@@ -496,7 +496,7 @@ impl<'a> Cursor<'a> {
                             format!("Unexpected character `{c}`"),
                             self.current_str().to_string(),
                             token.index,
-                        ))
+                        ));
                     }
                 },
                 State::Comment => match c {
