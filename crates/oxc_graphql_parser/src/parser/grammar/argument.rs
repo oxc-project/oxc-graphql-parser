@@ -96,12 +96,7 @@ type Query {
                         assert_eq!(argument.name().unwrap().text(), "category");
                         assert_eq!(argument.ty().unwrap().source_string(), "ProductCategory");
                         assert_eq!(
-                            argument
-                                .default_value()
-                                .unwrap()
-                                .value()
-                                .unwrap()
-                                .source_string(),
+                            argument.default_value().unwrap().value().unwrap().source_string(),
                             "ALL"
                         );
                     }

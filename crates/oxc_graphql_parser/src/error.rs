@@ -68,27 +68,15 @@ pub struct Error {
 impl Error {
     /// Create a new instance of `Error` with a `Location`.
     pub fn with_loc<S: Into<String>>(message: S, data: String, index: usize) -> Self {
-        Self {
-            message: message.into(),
-            data: ErrorData::Text(data),
-            index,
-        }
+        Self { message: message.into(), data: ErrorData::Text(data), index }
     }
 
     pub fn limit<S: Into<String>>(message: S, index: usize) -> Self {
-        Self {
-            message: message.into(),
-            data: ErrorData::LimitExceeded,
-            index,
-        }
+        Self { message: message.into(), data: ErrorData::LimitExceeded, index }
     }
 
     pub fn eof<S: Into<String>>(message: S, index: usize) -> Self {
-        Self {
-            message: message.into(),
-            data: ErrorData::Eof,
-            index,
-        }
+        Self { message: message.into(), data: ErrorData::Eof, index }
     }
 
     /// Get a reference to the error's data. This is usually the token that
@@ -129,10 +117,6 @@ impl fmt::Debug for Error {
         let start = self.index;
         let end = self.index + self.data.len();
 
-        write!(
-            f,
-            "ERROR@{}:{} {:?} {}",
-            start, end, self.message, self.data
-        )
+        write!(f, "ERROR@{}:{} {:?} {}", start, end, self.message, self.data)
     }
 }

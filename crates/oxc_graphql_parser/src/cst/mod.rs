@@ -173,10 +173,7 @@ pub struct CstChildren<N> {
 
 impl<N> CstChildren<N> {
     fn new(parent: &SyntaxNode) -> Self {
-        CstChildren {
-            inner: parent.children(),
-            ph: PhantomData,
-        }
+        CstChildren { inner: parent.children(), ph: PhantomData }
     }
 }
 
@@ -203,9 +200,6 @@ mod support {
     }
 
     pub(super) fn token(parent: &SyntaxNode, kind: SyntaxKind) -> Option<SyntaxToken> {
-        parent
-            .children_with_tokens()
-            .filter_map(|it| it.into_token())
-            .find(|it| it.kind() == kind)
+        parent.children_with_tokens().filter_map(|it| it.into_token()).find(|it| it.kind() == kind)
     }
 }

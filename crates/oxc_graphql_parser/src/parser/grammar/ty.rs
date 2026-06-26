@@ -121,11 +121,7 @@ mutation MyMutation($custId: [Int!]!) {
 
         for definition in doc.definitions() {
             if let cst::Definition::OperationDefinition(op_type) = definition {
-                for var in op_type
-                    .variable_definitions()
-                    .unwrap()
-                    .variable_definitions()
-                {
+                for var in op_type.variable_definitions().unwrap().variable_definitions() {
                     if let cst::Type::NamedType(name) = var.ty().unwrap() {
                         assert_eq!(name.source_string(), "[Int!]!")
                     }

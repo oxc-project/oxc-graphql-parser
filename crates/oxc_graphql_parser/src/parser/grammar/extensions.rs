@@ -60,10 +60,7 @@ extend input First @include(if: "first")
                         .root_operation_type_definitions()
                         .filter_map(|def| Some(def.named_type()?.name()?.text().to_string()))
                         .collect();
-                    assert_eq!(
-                        root_operation_type.as_slice(),
-                        ["MyMutationType".to_string()]
-                    )
+                    assert_eq!(root_operation_type.as_slice(), ["MyMutationType".to_string()])
                 }
                 cst::Definition::ScalarTypeExtension(scalar_ext) => {
                     assert_eq!(

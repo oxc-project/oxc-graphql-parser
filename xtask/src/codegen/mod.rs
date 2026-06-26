@@ -48,10 +48,7 @@ fn lower(grammar: &Grammar) -> CstSrc {
         .map(|it| it.to_string())
         .collect::<Vec<_>>();
 
-    let mut res = CstSrc {
-        tokens,
-        ..Default::default()
-    };
+    let mut res = CstSrc { tokens, ..Default::default() };
 
     let nodes = grammar.iter().collect::<Vec<_>>();
 
@@ -60,23 +57,13 @@ fn lower(grammar: &Grammar) -> CstSrc {
         let rule = &grammar[node].rule;
         match lower_enum(grammar, rule) {
             Some(variants) => {
-                let enum_src = CstEnumSrc {
-                    doc: Vec::new(),
-                    name,
-                    traits: Vec::new(),
-                    variants,
-                };
+                let enum_src = CstEnumSrc { doc: Vec::new(), name, traits: Vec::new(), variants };
                 res.enums.push(enum_src);
             }
             None => {
                 let mut fields = Vec::new();
                 lower_rule(&mut fields, grammar, None, rule);
-                res.nodes.push(CstNodeSrc {
-                    doc: Vec::new(),
-                    name,
-                    traits: Vec::new(),
-                    fields,
-                });
+                res.nodes.push(CstNodeSrc { doc: Vec::new(), name, traits: Vec::new(), fields });
             }
         }
     }
@@ -113,11 +100,7 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
         Rule::Node(node) => {
             let ty = grammar[*node].name.clone();
             let name = label.cloned().unwrap_or_else(|| to_lower_snake_case(&ty));
-            let field = Field::Node {
-                name,
-                ty,
-                cardinality: Cardinality::Optional,
-            };
+            let field = Field::Node { name, ty, cardinality: Cardinality::Optional };
             acc.push(field);
         }
         Rule::Token(token) => {
@@ -134,14 +117,8 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
         Rule::Rep(inner) => {
             if let Rule::Node(node) = &**inner {
                 let ty = grammar[*node].name.clone();
-                let name = label
-                    .cloned()
-                    .unwrap_or_else(|| pluralize(&to_lower_snake_case(&ty)));
-                let field = Field::Node {
-                    name,
-                    ty,
-                    cardinality: Cardinality::Many,
-                };
+                let name = label.cloned().unwrap_or_else(|| pluralize(&to_lower_snake_case(&ty)));
+                let field = Field::Node { name, ty, cardinality: Cardinality::Many };
                 acc.push(field);
                 return;
             }
@@ -190,11 +167,9 @@ fn lower_comma_list(
         _ => return false,
     };
     let (node, repeat, trailing_comma) = match rule.as_slice() {
-        [
-            Rule::Node(node),
-            Rule::Rep(repeat),
-            Rule::Opt(trailing_comma),
-        ] => (node, repeat, trailing_comma),
+        [Rule::Node(node), Rule::Rep(repeat), Rule::Opt(trailing_comma)] => {
+            (node, repeat, trailing_comma)
+        }
         _ => return false,
     };
     let repeat = match &**repeat {
@@ -206,14 +181,8 @@ fn lower_comma_list(
         _ => return false,
     }
     let ty = grammar[*node].name.clone();
-    let name = label
-        .cloned()
-        .unwrap_or_else(|| pluralize(&to_lower_snake_case(&ty)));
-    let field = Field::Node {
-        name,
-        ty,
-        cardinality: Cardinality::Many,
-    };
+    let name = label.cloned().unwrap_or_else(|| pluralize(&to_lower_snake_case(&ty)));
+    let field = Field::Node { name, ty, cardinality: Cardinality::Many };
     acc.push(field);
     true
 }
@@ -249,11 +218,7 @@ fn extract_enums(cst: &mut CstSrc) {
                 node.remove_field(to_remove);
                 let ty = enm.name.clone();
                 let name = to_lower_snake_case(&ty);
-                node.fields.push(Field::Node {
-                    name,
-                    ty,
-                    cardinality: Cardinality::Optional,
-                });
+                node.fields.push(Field::Node { name, ty, cardinality: Cardinality::Optional });
             }
         }
     }

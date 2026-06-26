@@ -455,8 +455,7 @@ impl<'input> Parser<'input> {
             return token;
         }
 
-        self.next_token()
-            .expect("Could not pop a token from the lexer")
+        self.next_token().expect("Could not pop a token from the lexer")
     }
 
     /// Insert a token into the syntax tree.
@@ -627,10 +626,7 @@ pub(crate) struct Checkpoint {
 
 impl Checkpoint {
     fn new(builder: Rc<RefCell<SyntaxTreeBuilder>>, checkpoint: rowan::Checkpoint) -> Self {
-        Self {
-            builder,
-            checkpoint,
-        }
+        Self { builder, checkpoint }
     }
 
     /// Wrap the nodes that were parsed since setting this checkpoint in a new parent node of kind
@@ -663,10 +659,7 @@ mod tests {
             .token_limit(18);
         let tree = parser.parse();
         let mut errors = tree.errors();
-        assert_eq!(
-            errors.next(),
-            Some(&Error::limit("token limit reached, aborting lexing", 65))
-        );
+        assert_eq!(errors.next(), Some(&Error::limit("token limit reached, aborting lexing", 65)));
         assert_eq!(errors.next(), None);
     }
 
@@ -687,18 +680,12 @@ mod tests {
         let parser = Parser::new(source).recursion_limit(10).token_limit(22);
         let cst = parser.parse();
         let errors = cst.errors().collect::<Vec<_>>();
-        assert_eq!(
-            errors,
-            &[&Error::limit("token limit reached, aborting lexing", 170),]
-        );
+        assert_eq!(errors, &[&Error::limit("token limit reached, aborting lexing", 170),]);
 
         let parser = Parser::new(source).recursion_limit(3).token_limit(200);
         let cst = parser.parse();
         let errors = cst.errors().collect::<Vec<_>>();
-        assert_eq!(
-            errors,
-            &[&Error::limit("parser recursion limit reached", 121),]
-        );
+        assert_eq!(errors, &[&Error::limit("parser recursion limit reached", 121),]);
     }
 
     #[test]
@@ -714,15 +701,9 @@ mod tests {
         let parser = Parser::new(source).token_limit(22);
         let cst = parser.parse();
         let mut errors = cst.errors();
-        assert_eq!(
-            errors.next(),
-            Some(&Error::with_loc("expected a Name", ")".to_string(), 70))
-        );
+        assert_eq!(errors.next(), Some(&Error::with_loc("expected a Name", ")".to_string(), 70)));
         // index 113 is immediately after the comment, before the newline
-        assert_eq!(
-            errors.next(),
-            Some(&Error::limit("token limit reached, aborting lexing", 113))
-        );
+        assert_eq!(errors.next(), Some(&Error::limit("token limit reached, aborting lexing", 113)));
         assert_eq!(errors.next(), None);
 
         let tree = expect![[r##"
@@ -785,17 +766,12 @@ mod tests {
         let interface_def = definitions.next().unwrap();
         assert_eq!(definitions.next(), None);
         assert!(matches!(query_def, Definition::ObjectTypeDefinition(_)));
-        assert!(matches!(
-            interface_def,
-            Definition::InterfaceTypeDefinition(_)
-        ));
+        assert!(matches!(interface_def, Definition::InterfaceTypeDefinition(_)));
     }
 
     #[test]
     fn token_limit() {
-        let cst = Parser::new("type Query { a a a a a a a a a }")
-            .token_limit(100)
-            .parse();
+        let cst = Parser::new("type Query { a a a a a a a a a }").token_limit(100).parse();
         // token count includes EOF token.
         assert_eq!(cst.token_limit().high, 26);
     }

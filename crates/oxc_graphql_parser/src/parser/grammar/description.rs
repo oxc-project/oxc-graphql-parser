@@ -33,12 +33,7 @@ type Query {
         let document = cst.document();
         for definition in document.definitions() {
             if let cst::Definition::ObjectTypeDefinition(obj_def) = definition {
-                let desc: String = obj_def
-                    .description()
-                    .unwrap()
-                    .string_value()
-                    .unwrap()
-                    .into();
+                let desc: String = obj_def.description().unwrap().string_value().unwrap().into();
                 assert_eq!(desc, "description for Query object type");
                 return;
             }

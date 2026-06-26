@@ -26,10 +26,7 @@ pub(crate) fn document(p: &mut Parser) {
     }
 
     p.peek_while(|p, kind| {
-        assert_eq!(
-            p.recursion_limit.current, 0,
-            "unbalanced limit increment / decrement"
-        );
+        assert_eq!(p.recursion_limit.current, 0, "unbalanced limit increment / decrement");
 
         match kind {
             TokenKind::StringValue => {
@@ -177,11 +174,7 @@ extend type Query {
             match definition {
                 cst::Definition::DirectiveDefinition(directive) => {
                     assert_eq!(
-                        directive
-                            .name()
-                            .expect("Cannot get directive name.")
-                            .text()
-                            .as_ref(),
+                        directive.name().expect("Cannot get directive name.").text().as_ref(),
                         "tag"
                     )
                 }
@@ -250,27 +243,20 @@ enum join__Graph {
         let document = cst.document();
         for definition in document.definitions() {
             if let cst::Definition::EnumTypeDefinition(enum_type) = definition {
-                let enum_name = enum_type
-                    .name()
-                    .expect("Could not get Enum Type Definition's Name");
+                let enum_name =
+                    enum_type.name().expect("Could not get Enum Type Definition's Name");
 
                 assert_eq!("join__Graph", enum_name.text().as_ref());
 
-                if enum_name.text().as_ref() == "join__Graph" {
-                    if let Some(enums) = enum_type.enum_values_definition() {
-                        for enum_kind in enums.enum_value_definitions() {
-                            assert_eq!(
-                                "ACCOUNTS",
-                                enum_kind
-                                    .enum_value()
-                                    .unwrap()
-                                    .name()
-                                    .unwrap()
-                                    .text()
-                                    .as_ref()
-                            );
-                            check_directive_arguments(enum_kind);
-                        }
+                if enum_name.text().as_ref() == "join__Graph"
+                    && let Some(enums) = enum_type.enum_values_definition()
+                {
+                    for enum_kind in enums.enum_value_definitions() {
+                        assert_eq!(
+                            "ACCOUNTS",
+                            enum_kind.enum_value().unwrap().name().unwrap().text().as_ref()
+                        );
+                        check_directive_arguments(enum_kind);
                     }
                 }
             }
@@ -279,11 +265,7 @@ enum join__Graph {
         fn check_directive_arguments(enum_kind: cst::EnumValueDefinition) {
             if let Some(directives) = enum_kind.directives() {
                 for directive in directives.directives() {
-                    if directive
-                        .name()
-                        .and_then(|n| n.ident_token())
-                        .as_ref()
-                        .map(|id| id.text())
+                    if directive.name().and_then(|n| n.ident_token()).as_ref().map(|id| id.text())
                         == Some("join__graph")
                     {
                         for argument in directive.arguments().unwrap().arguments() {

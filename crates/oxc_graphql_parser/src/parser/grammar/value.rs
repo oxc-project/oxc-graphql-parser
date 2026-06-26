@@ -365,10 +365,7 @@ query GraphQuery($graph_id: ID!, $variant: String) {
                     .flat_map(|v| v.variable_definitions())
                     .filter_map(|v| Some(v.variable()?.text().to_string()))
                     .collect();
-                assert_eq!(
-                    variables.as_slice(),
-                    ["graph_id".to_string(), "variant".to_string()]
-                );
+                assert_eq!(variables.as_slice(), ["graph_id".to_string(), "variant".to_string()]);
             }
         }
     }

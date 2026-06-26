@@ -15,17 +15,13 @@ impl cst::Name {
 
 impl cst::Variable {
     pub fn text(&self) -> TokenText {
-        self.name()
-            .expect("Cannot get variable's NAME token")
-            .text()
+        self.name().expect("Cannot get variable's NAME token").text()
     }
 }
 
 impl cst::EnumValue {
     pub fn text(&self) -> TokenText {
-        self.name()
-            .expect("Cannot get enum value's NAME token")
-            .text()
+        self.name().expect("Cannot get enum value's NAME token").text()
     }
 }
 
@@ -130,10 +126,7 @@ impl cst::Definition {
     }
 
     pub fn is_executable_definition(&self) -> bool {
-        matches!(
-            self,
-            Self::OperationDefinition(_) | Self::FragmentDefinition(_)
-        )
+        matches!(self, Self::OperationDefinition(_) | Self::FragmentDefinition(_))
     }
 
     pub fn is_extension_definition(&self) -> bool {
@@ -218,10 +211,7 @@ struct GraphQLLines<'a> {
 
 impl<'a> GraphQLLines<'a> {
     fn new(input: &'a str) -> Self {
-        Self {
-            input,
-            finished: false,
-        }
+        Self { input, finished: false }
     }
 }
 
@@ -439,13 +429,8 @@ impl TryFrom<&'_ cst::BooleanValue> for bool {
 }
 
 fn text_of_first_token(node: &SyntaxNode) -> TokenText {
-    let first_token = node
-        .green()
-        .children()
-        .next()
-        .and_then(|it| it.into_token())
-        .unwrap()
-        .to_owned();
+    let first_token =
+        node.green().children().next().and_then(|it| it.into_token()).unwrap().to_owned();
 
     TokenText(first_token)
 }
@@ -463,10 +448,7 @@ mod string_tests {
     #[test]
     fn it_unescapes_strings() {
         assert_eq!(unescape_string(r#"quote \""#), "quote \"");
-        assert_eq!(
-            unescape_string(r"escaped \n\r\b\t\f"),
-            "escaped \n\r\u{0008}\t\u{000c}"
-        );
+        assert_eq!(unescape_string(r"escaped \n\r\b\t\f"), "escaped \n\r\u{0008}\t\u{000c}");
         assert_eq!(unescape_string(r"slashes \\ \/"), r"slashes \ /");
         assert_eq!(
             unescape_string("unescaped unicode outside BMP 😀"),
@@ -499,23 +481,12 @@ mod block_string_tests {
 
         assert_eq!(
             plain_newlines,
-            [
-                "source text",
-                "    with some",
-                "    new",
-                "",
-                "",
-                "    lines",
-                "        ",
-            ]
+            ["source text", "    with some", "    new", "", "", "    lines", "        ",]
         );
 
         let different_endings: Vec<_> =
             split_lines("with\nand\r\nand\rall in the same\r\nstring").collect();
-        assert_eq!(
-            different_endings,
-            ["with", "and", "and", "all in the same", "string",]
-        );
+        assert_eq!(different_endings, ["with", "and", "and", "all in the same", "string",]);
 
         let empty_string: Vec<_> = split_lines("").collect();
         assert_eq!(empty_string, [""]);
@@ -533,10 +504,7 @@ mod block_string_tests {
 
     #[test]
     fn it_does_not_unescape_block_strings() {
-        assert_eq!(
-            unescape_block_string(r"escaped \n\r\b\t\f"),
-            r"escaped \n\r\b\t\f"
-        );
+        assert_eq!(unescape_block_string(r"escaped \n\r\b\t\f"), r"escaped \n\r\b\t\f");
         assert_eq!(unescape_block_string(r"slashes \\ \/"), r"slashes \\ \/");
         assert_eq!(
             unescape_block_string("unescaped unicode outside BMP \u{1f600}"),

@@ -42,11 +42,7 @@ fn run_lint() -> Result<()> {
 
     cmd!(sh, "cargo +nightly fmt --all -- --check").run()?;
 
-    cmd!(
-        sh,
-        "cargo clippy --all-targets --all-features -- -D warnings"
-    )
-    .run()?;
+    cmd!(sh, "cargo clippy --all-targets --all-features -- -D warnings").run()?;
 
     Ok(())
 }
@@ -98,9 +94,7 @@ fn reformat(text: &str) -> Result<String> {
     let sh = Shell::new()?;
     let _e = sh.push_env("RUSTUP_TOOLCHAIN", "stable");
     rustfmt()?;
-    let stdout = cmd!(sh, "rustfmt --config fn_single_line=true")
-        .stdin(text)
-        .read()?;
+    let stdout = cmd!(sh, "rustfmt").stdin(text).read()?;
     Ok(format!(
         "{}\n\n{}\n",
         "//! This is a generated file, please do not edit manually. Changes can be
@@ -135,5 +129,13 @@ pub(crate) fn ensure_file_contents(file: &Path, contents: &str) -> Result<()> {
 }
 
 fn normalize_newlines(s: &str) -> String {
-    s.replace("\r\n", "\n")
+    let mut normalized = String::with_capacity(s.len());
+    let mut chars = s.chars().peekable();
+    while let Some(ch) = chars.next() {
+        if ch == '\r' && chars.peek() == Some(&'\n') {
+            continue;
+        }
+        normalized.push(ch);
+    }
+    normalized
 }

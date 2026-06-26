@@ -136,11 +136,7 @@ impl<'a> Iterator for Lexer<'a> {
 impl<'a> Cursor<'a> {
     fn advance(&mut self) -> Result<Token<'a>, Error> {
         let mut state = State::Start;
-        let mut token = Token {
-            kind: TokenKind::Eof,
-            data: "",
-            index: self.index(),
-        };
+        let mut token = Token { kind: TokenKind::Eof, data: "", index: self.index() };
 
         loop {
             let Some(c) = self.bump() else {
@@ -535,11 +531,7 @@ impl<'a> Cursor<'a> {
             | State::StringLiteralBackslash => {
                 let curr = self.drain();
 
-                Err(Error::with_loc(
-                    "unterminated string value",
-                    curr.to_string(),
-                    token.index,
-                ))
+                Err(Error::with_loc("unterminated string value", curr.to_string(), token.index))
             }
             State::SpreadOperator => self.unterminated_spread_operator(&token),
             State::MinusSign => Err(Error::with_loc(
@@ -574,17 +566,9 @@ impl<'a> Cursor<'a> {
     }
 
     fn unterminated_spread_operator(&mut self, token: &Token<'a>) -> Result<Token<'a>, Error> {
-        let data = if self.is_pending() {
-            self.prev_str()
-        } else {
-            self.current_str()
-        };
+        let data = if self.is_pending() { self.prev_str() } else { self.current_str() };
 
-        Err(Error::with_loc(
-            "Unterminated spread operator",
-            data.to_string(),
-            token.index,
-        ))
+        Err(Error::with_loc("Unterminated spread operator", data.to_string(), token.index))
     }
 
     fn done(&mut self, token: Token<'a>) -> Result<Token<'a>, Error> {
@@ -651,10 +635,7 @@ type Query {
         let lexer = Lexer::new("type Query { a a a a a a a a a }").with_limit(10);
         let (tokens, errors) = lexer.lex();
         assert_eq!(tokens.len(), 10);
-        assert_eq!(
-            errors,
-            &[Error::limit("token limit reached, aborting lexing", 17)]
-        );
+        assert_eq!(errors, &[Error::limit("token limit reached, aborting lexing", 17)]);
     }
 
     #[test]
@@ -667,10 +648,7 @@ type Query {
         let lexer = Lexer::new("type Query { a a a a a a a a a }").with_limit(25);
         let (tokens, errors) = lexer.lex();
         assert_eq!(tokens.len(), 25);
-        assert_eq!(
-            errors,
-            &[Error::limit("token limit reached, aborting lexing", 31)]
-        );
+        assert_eq!(errors, &[Error::limit("token limit reached, aborting lexing", 31)]);
     }
 
     #[test]
@@ -698,9 +676,8 @@ type Query {
         "#;
 
         let lexer = Lexer::new(schema);
-        let processed_schema = lexer
-            .into_iter()
-            .fold(String::new(), |acc, token| acc + token.unwrap().data());
+        let processed_schema =
+            lexer.into_iter().fold(String::new(), |acc, token| acc + token.unwrap().data());
 
         assert_eq!(schema, processed_schema);
     }
@@ -772,13 +749,6 @@ type Query {
         "#;
         let (tokens, errors) = Lexer::new(schema).lex();
         dbg!(tokens);
-        assert_eq!(
-            errors,
-            &[Error::with_loc(
-                "Unexpected character \"/\"",
-                "/".to_string(),
-                33,
-            )]
-        );
+        assert_eq!(errors, &[Error::with_loc("Unexpected character \"/\"", "/".to_string(), 33,)]);
     }
 }

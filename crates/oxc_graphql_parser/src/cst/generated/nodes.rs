@@ -1032,6 +1032,7 @@ impl DirectiveLocation {
         support::token(&self.syntax, S![INPUT_FIELD_DEFINITION])
     }
 }
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Definition {
     OperationDefinition(OperationDefinition),
@@ -1052,12 +1053,14 @@ pub enum Definition {
     EnumTypeExtension(EnumTypeExtension),
     InputObjectTypeExtension(InputObjectTypeExtension),
 }
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Selection {
     Field(Field),
     FragmentSpread(FragmentSpread),
     InlineFragment(InlineFragment),
 }
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Value {
     Variable(Variable),
@@ -1070,6 +1073,7 @@ pub enum Value {
     ListValue(ListValue),
     ObjectValue(ObjectValue),
 }
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Type {
     NamedType(NamedType),
@@ -1081,11 +1085,7 @@ impl CstNode for Name {
         kind == NAME
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1096,11 +1096,7 @@ impl CstNode for Document {
         kind == DOCUMENT
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1111,11 +1107,7 @@ impl CstNode for OperationDefinition {
         kind == OPERATION_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1126,11 +1118,7 @@ impl CstNode for FragmentDefinition {
         kind == FRAGMENT_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1141,11 +1129,7 @@ impl CstNode for DirectiveDefinition {
         kind == DIRECTIVE_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1156,11 +1140,7 @@ impl CstNode for SchemaDefinition {
         kind == SCHEMA_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1171,11 +1151,7 @@ impl CstNode for ScalarTypeDefinition {
         kind == SCALAR_TYPE_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1186,11 +1162,7 @@ impl CstNode for ObjectTypeDefinition {
         kind == OBJECT_TYPE_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1201,11 +1173,7 @@ impl CstNode for InterfaceTypeDefinition {
         kind == INTERFACE_TYPE_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1216,11 +1184,7 @@ impl CstNode for UnionTypeDefinition {
         kind == UNION_TYPE_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1231,11 +1195,7 @@ impl CstNode for EnumTypeDefinition {
         kind == ENUM_TYPE_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1246,11 +1206,7 @@ impl CstNode for InputObjectTypeDefinition {
         kind == INPUT_OBJECT_TYPE_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1261,11 +1217,7 @@ impl CstNode for SchemaExtension {
         kind == SCHEMA_EXTENSION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1276,11 +1228,7 @@ impl CstNode for ScalarTypeExtension {
         kind == SCALAR_TYPE_EXTENSION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1291,11 +1239,7 @@ impl CstNode for ObjectTypeExtension {
         kind == OBJECT_TYPE_EXTENSION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1306,11 +1250,7 @@ impl CstNode for InterfaceTypeExtension {
         kind == INTERFACE_TYPE_EXTENSION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1321,11 +1261,7 @@ impl CstNode for UnionTypeExtension {
         kind == UNION_TYPE_EXTENSION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1336,11 +1272,7 @@ impl CstNode for EnumTypeExtension {
         kind == ENUM_TYPE_EXTENSION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1351,11 +1283,7 @@ impl CstNode for InputObjectTypeExtension {
         kind == INPUT_OBJECT_TYPE_EXTENSION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1366,11 +1294,7 @@ impl CstNode for Description {
         kind == DESCRIPTION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1381,11 +1305,7 @@ impl CstNode for OperationType {
         kind == OPERATION_TYPE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1396,11 +1316,7 @@ impl CstNode for VariableDefinitions {
         kind == VARIABLE_DEFINITIONS
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1411,11 +1327,7 @@ impl CstNode for Directives {
         kind == DIRECTIVES
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1426,11 +1338,7 @@ impl CstNode for SelectionSet {
         kind == SELECTION_SET
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1441,11 +1349,7 @@ impl CstNode for Field {
         kind == FIELD
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1456,11 +1360,7 @@ impl CstNode for FragmentSpread {
         kind == FRAGMENT_SPREAD
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1471,11 +1371,7 @@ impl CstNode for InlineFragment {
         kind == INLINE_FRAGMENT
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1486,11 +1382,7 @@ impl CstNode for Alias {
         kind == ALIAS
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1501,11 +1393,7 @@ impl CstNode for Arguments {
         kind == ARGUMENTS
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1516,11 +1404,7 @@ impl CstNode for Argument {
         kind == ARGUMENT
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1531,11 +1415,7 @@ impl CstNode for FragmentName {
         kind == FRAGMENT_NAME
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1546,11 +1426,7 @@ impl CstNode for TypeCondition {
         kind == TYPE_CONDITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1561,11 +1437,7 @@ impl CstNode for NamedType {
         kind == NAMED_TYPE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1576,11 +1448,7 @@ impl CstNode for Variable {
         kind == VARIABLE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1591,11 +1459,7 @@ impl CstNode for StringValue {
         kind == STRING_VALUE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1606,11 +1470,7 @@ impl CstNode for FloatValue {
         kind == FLOAT_VALUE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1621,11 +1481,7 @@ impl CstNode for IntValue {
         kind == INT_VALUE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1636,11 +1492,7 @@ impl CstNode for BooleanValue {
         kind == BOOLEAN_VALUE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1651,11 +1503,7 @@ impl CstNode for NullValue {
         kind == NULL_VALUE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1666,11 +1514,7 @@ impl CstNode for EnumValue {
         kind == ENUM_VALUE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1681,11 +1525,7 @@ impl CstNode for ListValue {
         kind == LIST_VALUE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1696,11 +1536,7 @@ impl CstNode for ObjectValue {
         kind == OBJECT_VALUE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1711,11 +1547,7 @@ impl CstNode for ObjectField {
         kind == OBJECT_FIELD
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1726,11 +1558,7 @@ impl CstNode for VariableDefinition {
         kind == VARIABLE_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1741,11 +1569,7 @@ impl CstNode for DefaultValue {
         kind == DEFAULT_VALUE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1756,11 +1580,7 @@ impl CstNode for ListType {
         kind == LIST_TYPE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1771,11 +1591,7 @@ impl CstNode for NonNullType {
         kind == NON_NULL_TYPE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1786,11 +1602,7 @@ impl CstNode for Directive {
         kind == DIRECTIVE
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1801,11 +1613,7 @@ impl CstNode for RootOperationTypeDefinition {
         kind == ROOT_OPERATION_TYPE_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1816,11 +1624,7 @@ impl CstNode for ImplementsInterfaces {
         kind == IMPLEMENTS_INTERFACES
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1831,11 +1635,7 @@ impl CstNode for FieldsDefinition {
         kind == FIELDS_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1846,11 +1646,7 @@ impl CstNode for FieldDefinition {
         kind == FIELD_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1861,11 +1657,7 @@ impl CstNode for ArgumentsDefinition {
         kind == ARGUMENTS_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1876,11 +1668,7 @@ impl CstNode for InputValueDefinition {
         kind == INPUT_VALUE_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1891,11 +1679,7 @@ impl CstNode for UnionMemberTypes {
         kind == UNION_MEMBER_TYPES
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1906,11 +1690,7 @@ impl CstNode for EnumValuesDefinition {
         kind == ENUM_VALUES_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1921,11 +1701,7 @@ impl CstNode for EnumValueDefinition {
         kind == ENUM_VALUE_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1936,11 +1712,7 @@ impl CstNode for InputFieldsDefinition {
         kind == INPUT_FIELDS_DEFINITION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1951,11 +1723,7 @@ impl CstNode for DirectiveLocations {
         kind == DIRECTIVE_LOCATIONS
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax
@@ -1966,11 +1734,7 @@ impl CstNode for DirectiveLocation {
         kind == DIRECTIVE_LOCATION
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
     }
     fn syntax(&self) -> &SyntaxNode {
         &self.syntax

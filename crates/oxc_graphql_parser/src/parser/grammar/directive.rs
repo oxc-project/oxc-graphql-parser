@@ -49,10 +49,10 @@ pub(crate) fn directive_definition(p: &mut Parser) {
         p.expect(T![')'], S![')']);
     }
 
-    if let Some(node) = p.peek_data() {
-        if node == "repeatable" {
-            p.bump(SyntaxKind::repeatable_KW);
-        }
+    if let Some(node) = p.peek_data()
+        && node == "repeatable"
+    {
+        p.bump(SyntaxKind::repeatable_KW);
     }
 
     if let Some(node) = p.peek_data() {
@@ -223,10 +223,7 @@ directive @example(isTreat: Boolean, treatKind: String) repeatable on FIELD | MU
         let document = cst.document();
         for definition in document.definitions() {
             if let cst::Definition::DirectiveDefinition(dir_def) = definition {
-                assert_eq!(
-                    dir_def.repeatable_token().unwrap().kind(),
-                    SyntaxKind::repeatable_KW
-                );
+                assert_eq!(dir_def.repeatable_token().unwrap().kind(), SyntaxKind::repeatable_KW);
                 return;
             }
         }
@@ -251,10 +248,7 @@ directive @example on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
                     .directive_locations()
                     .map(|loc| loc.text().unwrap().to_string())
                     .collect();
-                assert_eq!(
-                    dir_locations,
-                    ["FIELD", "FRAGMENT_SPREAD", "INLINE_FRAGMENT"]
-                );
+                assert_eq!(dir_locations, ["FIELD", "FRAGMENT_SPREAD", "INLINE_FRAGMENT"]);
                 return;
             }
         }
@@ -282,10 +276,7 @@ directive @example on
                     .directive_locations()
                     .map(|loc| loc.text().unwrap().to_string())
                     .collect();
-                assert_eq!(
-                    dir_locations,
-                    ["FIELD", "FRAGMENT_SPREAD", "INLINE_FRAGMENT"]
-                );
+                assert_eq!(dir_locations, ["FIELD", "FRAGMENT_SPREAD", "INLINE_FRAGMENT"]);
                 return;
             }
         }

@@ -113,9 +113,7 @@ mod test {
     #[test]
     fn it_parses_operation_description_when_enabled() {
         let input = "\"Query description\"\nquery MyQuery { field }";
-        let cst = Parser::new(input)
-            .allow_executable_descriptions(true)
-            .parse();
+        let cst = Parser::new(input).allow_executable_descriptions(true).parse();
 
         assert_eq!(cst.errors().len(), 0);
         let def = cst.document().definitions().next().unwrap();

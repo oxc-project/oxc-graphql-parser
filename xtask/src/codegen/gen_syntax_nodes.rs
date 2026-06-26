@@ -6,7 +6,7 @@ use crate::reformat;
 use anyhow::Result;
 use quote::format_ident;
 use quote::quote;
-use std::collections::HashSet;
+use std::collections::BTreeSet;
 use std::fmt::Write;
 
 pub(crate) fn generate_nodes(kinds: KindsSrc<'_>, grammar: &CstSrc) -> Result<String> {
@@ -78,11 +78,7 @@ pub(crate) fn generate_nodes(kinds: KindsSrc<'_>, grammar: &CstSrc) -> Result<St
         .enums
         .iter()
         .map(|en| {
-            let variants: Vec<_> = en
-                .variants
-                .iter()
-                .map(|var| format_ident!("{}", var))
-                .collect();
+            let variants: Vec<_> = en.variants.iter().map(|var| format_ident!("{}", var)).collect();
             let name = format_ident!("{}", en.name);
             let kinds: Vec<_> = variants
                 .iter()
@@ -124,6 +120,7 @@ pub(crate) fn generate_nodes(kinds: KindsSrc<'_>, grammar: &CstSrc) -> Result<St
             (
                 quote! {
                     #[pretty_doc_comment_placeholder_workaround]
+                    #[allow(clippy::enum_variant_names)]
                     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
                     pub enum #name {
                         #(#variants(#variants),)*
@@ -146,7 +143,7 @@ pub(crate) fn generate_nodes(kinds: KindsSrc<'_>, grammar: &CstSrc) -> Result<St
         .unzip();
 
     let node_names = grammar.nodes.iter().map(|it| &it.name);
-    let defined_nodes: HashSet<_> = node_names.collect();
+    let defined_nodes: BTreeSet<_> = node_names.collect();
 
     for node in kinds
         .nodes
@@ -172,15 +169,12 @@ pub(crate) fn generate_nodes(kinds: KindsSrc<'_>, grammar: &CstSrc) -> Result<St
         #(#enum_boilerplate_impls)*
     };
 
-    let cst = cst.to_string().replace("S ! [", "S![");
+    let cst = replace_all(&cst.to_string(), "S ! [", "S![");
 
     let mut res = String::with_capacity(cst.len() * 2);
 
-    let mut docs = grammar
-        .nodes
-        .iter()
-        .map(|it| &it.doc)
-        .chain(grammar.enums.iter().map(|it| &it.doc));
+    let mut docs =
+        grammar.nodes.iter().map(|it| &it.doc).chain(grammar.enums.iter().map(|it| &it.doc));
 
     for chunk in cst.split("# [pretty_doc_comment_placeholder_workaround] ") {
         res.push_str(chunk);
@@ -231,13 +225,7 @@ fn write_doc_comment(contents: &[String], dest: &mut String) {
 
 impl Field {
     pub(crate) fn is_many(&self) -> bool {
-        matches!(
-            self,
-            Field::Node {
-                cardinality: Cardinality::Many,
-                ..
-            }
-        )
+        matches!(self, Field::Node { cardinality: Cardinality::Many, .. })
     }
     pub(crate) fn token_kind(&self) -> Option<proc_macro2::TokenStream> {
         match self {
@@ -270,7 +258,7 @@ impl Field {
                     "..." => "dotdotdot",
                     _ => name,
                 };
-                format_ident!("{}_token", name.to_lowercase())
+                format_ident!("{}_token", to_ascii_lowercase(name))
             }
             Field::Node { name, .. } => {
                 if name == "type" {
@@ -287,4 +275,20 @@ impl Field {
             Field::Node { ty, .. } => format_ident!("{}", ty),
         }
     }
+}
+
+fn replace_all(input: &str, from: &str, to: &str) -> String {
+    let mut output = String::with_capacity(input.len());
+    let mut rest = input;
+    while let Some(index) = rest.find(from) {
+        output.push_str(&rest[..index]);
+        output.push_str(to);
+        rest = &rest[index + from.len()..];
+    }
+    output.push_str(rest);
+    output
+}
+
+fn to_ascii_lowercase(input: &str) -> String {
+    input.chars().map(|c| c.to_ascii_lowercase()).collect()
 }

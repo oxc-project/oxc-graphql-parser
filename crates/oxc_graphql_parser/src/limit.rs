@@ -48,11 +48,7 @@ pub struct LimitTracker {
 
 impl LimitTracker {
     pub fn new(limit: usize) -> Self {
-        Self {
-            current: 0,
-            high: 0,
-            limit,
-        }
+        Self { current: 0, high: 0, limit }
     }
 
     /// Return whether the limit was reached

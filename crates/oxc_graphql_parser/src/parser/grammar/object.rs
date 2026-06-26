@@ -32,10 +32,11 @@ pub(crate) fn object_type_definition(p: &mut Parser) {
         _ => p.err("expected a name"),
     }
 
-    if let Some(token) = p.peek_token() {
-        if token.kind() == TokenKind::Name && token.data() == "implements" {
-            implements_interfaces(p);
-        }
+    if let Some(token) = p.peek_token()
+        && token.kind() == TokenKind::Name
+        && token.data() == "implements"
+    {
+        implements_interfaces(p);
     }
 
     if let Some(T![@]) = p.peek() {
@@ -125,10 +126,8 @@ type Business implements NamedEntity & ValuedEntity & CatEntity {
         for def in doc.definitions() {
             if let cst::Definition::ObjectTypeDefinition(interface_type) = def {
                 assert_eq!(interface_type.name().unwrap().text(), "Business");
-                for implements_interfaces in interface_type
-                    .implements_interfaces()
-                    .unwrap()
-                    .named_types()
+                for implements_interfaces in
+                    interface_type.implements_interfaces().unwrap().named_types()
                 {
                     // NamedEntity ValuedEntity CatEntity
                     println!("{}", implements_interfaces.name().unwrap().text());

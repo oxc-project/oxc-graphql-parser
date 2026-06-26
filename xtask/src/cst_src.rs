@@ -172,11 +172,7 @@ pub(crate) struct CstNodeSrc {
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) enum Field {
     Token(String),
-    Node {
-        name: String,
-        ty: String,
-        cardinality: Cardinality,
-    },
+    Node { name: String, ty: String, cardinality: Cardinality },
 }
 
 #[derive(Debug, Eq, PartialEq)]

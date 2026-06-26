@@ -30,9 +30,7 @@ fn bench_supergraph_parser(c: &mut Criterion) {
     let schema =
         include_str!("../crates/oxc_graphql_parser/test_data/parser/ok/0032_supergraph.graphql");
 
-    c.bench_function("supergraph_parser", move |b| {
-        b.iter(|| parse_schema(schema))
-    });
+    c.bench_function("supergraph_parser", move |b| b.iter(|| parse_schema(schema)));
 }
 
 fn bench_supergraph_lexer(c: &mut Criterion) {

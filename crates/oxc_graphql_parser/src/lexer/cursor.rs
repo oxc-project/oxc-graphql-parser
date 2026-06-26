@@ -41,10 +41,7 @@ impl<'a> Cursor<'a> {
         let slice = &self.source[self.index..self.offset];
 
         self.index = self.offset;
-        self.pending = self
-            .source
-            .get(self.offset..)
-            .and_then(|subslice| subslice.chars().next());
+        self.pending = self.source.get(self.offset..).and_then(|subslice| subslice.chars().next());
 
         slice
     }

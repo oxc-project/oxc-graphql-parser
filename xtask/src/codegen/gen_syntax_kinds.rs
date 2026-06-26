@@ -23,41 +23,22 @@ pub(crate) fn generate_kinds(kinds: KindsSrc<'_>) -> Result<String> {
             quote! { #(#cs)* }
         }
     });
-    let punctuation = kinds
-        .punct
-        .iter()
-        .map(|(_token, name)| format_ident!("{}", name))
-        .collect::<Vec<_>>();
+    let punctuation =
+        kinds.punct.iter().map(|(_token, name)| format_ident!("{}", name)).collect::<Vec<_>>();
 
     let full_keywords_values = &kinds.keywords;
-    let full_keywords = full_keywords_values
-        .iter()
-        .map(|kw| format_ident!("{}_KW", kw));
+    let full_keywords = full_keywords_values.iter().map(|kw| format_ident!("{}_KW", kw));
 
     let all_keywords_values = kinds.keywords.iter().collect::<Vec<_>>();
     let all_keywords_idents = all_keywords_values.iter().map(|kw| format_ident!("{}", kw));
-    let all_keywords = all_keywords_values
-        .iter()
-        .map(|name| format_ident!("{}_KW", name))
-        .collect::<Vec<_>>();
+    let all_keywords =
+        all_keywords_values.iter().map(|name| format_ident!("{}_KW", name)).collect::<Vec<_>>();
 
-    let literals = kinds
-        .literals
-        .iter()
-        .map(|name| format_ident!("{}", name))
-        .collect::<Vec<_>>();
+    let literals = kinds.literals.iter().map(|name| format_ident!("{}", name)).collect::<Vec<_>>();
 
-    let tokens = kinds
-        .tokens
-        .iter()
-        .map(|name| format_ident!("{}", name))
-        .collect::<Vec<_>>();
+    let tokens = kinds.tokens.iter().map(|name| format_ident!("{}", name)).collect::<Vec<_>>();
 
-    let nodes = kinds
-        .nodes
-        .iter()
-        .map(|name| format_ident!("{}", name))
-        .collect::<Vec<_>>();
+    let nodes = kinds.nodes.iter().map(|name| format_ident!("{}", name)).collect::<Vec<_>>();
 
     let cst = quote! {
         #![allow(bad_style, missing_docs, unreachable_pub, clippy::manual_non_exhaustive, clippy::upper_case_acronyms)]

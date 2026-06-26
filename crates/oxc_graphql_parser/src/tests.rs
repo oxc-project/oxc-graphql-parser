@@ -56,23 +56,12 @@ fn parser_tests() {
 }
 
 fn assert_errors_are_present(errors: &[Error], path: &Path) {
-    assert!(
-        !errors.is_empty(),
-        "There should be errors in the file {:?}",
-        path.display()
-    );
+    assert!(!errors.is_empty(), "There should be errors in the file {:?}", path.display());
 }
 
 fn assert_errors_are_absent(errors: &[Error], path: &Path) {
     if !errors.is_empty() {
-        println!(
-            "errors: {}",
-            errors
-                .iter()
-                .map(|e| e.to_string())
-                .collect::<Vec<_>>()
-                .join("\n")
-        );
+        println!("errors: {}", errors.iter().map(|e| e.to_string()).collect::<Vec<_>>().join("\n"));
         panic!("There should be no errors in the file {:?}", path.display(),);
     }
 }

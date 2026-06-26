@@ -121,42 +121,42 @@ mod test {
         let doc = cst.document();
 
         for def in doc.definitions() {
-            if let cst::Definition::OperationDefinition(op_def) = def {
-                if let Some(selection_set) = op_def.selection_set() {
-                    for selection in selection_set.selections() {
-                        match selection {
-                            cst::Selection::Field(field) => {
-                                assert_eq!(
-                                    "animal".to_string(),
-                                    field.name().unwrap().text().to_string()
-                                );
-                            }
-                            cst::Selection::FragmentSpread(f_spread) => {
-                                assert_eq!(
-                                    "snackSelection".to_string(),
-                                    f_spread
-                                        .fragment_name()
-                                        .unwrap()
-                                        .name()
-                                        .unwrap()
-                                        .text()
-                                        .to_string()
-                                )
-                            }
-                            cst::Selection::InlineFragment(inline_fragment) => {
-                                assert_eq!(
-                                    "Pet".to_string(),
-                                    inline_fragment
-                                        .type_condition()
-                                        .unwrap()
-                                        .named_type()
-                                        .unwrap()
-                                        .name()
-                                        .unwrap()
-                                        .text()
-                                        .to_string()
-                                );
-                            }
+            if let cst::Definition::OperationDefinition(op_def) = def
+                && let Some(selection_set) = op_def.selection_set()
+            {
+                for selection in selection_set.selections() {
+                    match selection {
+                        cst::Selection::Field(field) => {
+                            assert_eq!(
+                                "animal".to_string(),
+                                field.name().unwrap().text().to_string()
+                            );
+                        }
+                        cst::Selection::FragmentSpread(f_spread) => {
+                            assert_eq!(
+                                "snackSelection".to_string(),
+                                f_spread
+                                    .fragment_name()
+                                    .unwrap()
+                                    .name()
+                                    .unwrap()
+                                    .text()
+                                    .to_string()
+                            )
+                        }
+                        cst::Selection::InlineFragment(inline_fragment) => {
+                            assert_eq!(
+                                "Pet".to_string(),
+                                inline_fragment
+                                    .type_condition()
+                                    .unwrap()
+                                    .named_type()
+                                    .unwrap()
+                                    .name()
+                                    .unwrap()
+                                    .text()
+                                    .to_string()
+                            );
                         }
                     }
                 }

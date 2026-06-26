@@ -98,9 +98,7 @@ impl<T: CstNode> SyntaxTree<T> {
 impl SyntaxTree<cst::Document> {
     /// Return the root typed `Document` node.
     pub fn document(&self) -> cst::Document {
-        cst::Document {
-            syntax: self.syntax_node(),
-        }
+        cst::Document { syntax: self.syntax_node() }
     }
 }
 
@@ -108,9 +106,7 @@ impl SyntaxTree<cst::SelectionSet> {
     /// Return the root typed `SelectionSet` node. This is used for parsing
     /// selection sets defined by @requires directive.
     pub fn field_set(&self) -> cst::SelectionSet {
-        cst::SelectionSet {
-            syntax: self.syntax_node(),
-        }
+        cst::SelectionSet { syntax: self.syntax_node() }
     }
 }
 
@@ -119,15 +115,15 @@ impl SyntaxTree<cst::Type> {
     /// selection sets defined by @requires directive.
     pub fn ty(&self) -> cst::Type {
         match self.syntax_node().kind() {
-            SyntaxKind::NAMED_TYPE => cst::Type::NamedType(cst::NamedType {
-                syntax: self.syntax_node(),
-            }),
-            SyntaxKind::LIST_TYPE => cst::Type::ListType(cst::ListType {
-                syntax: self.syntax_node(),
-            }),
-            SyntaxKind::NON_NULL_TYPE => cst::Type::NonNullType(cst::NonNullType {
-                syntax: self.syntax_node(),
-            }),
+            SyntaxKind::NAMED_TYPE => {
+                cst::Type::NamedType(cst::NamedType { syntax: self.syntax_node() })
+            }
+            SyntaxKind::LIST_TYPE => {
+                cst::Type::ListType(cst::ListType { syntax: self.syntax_node() })
+            }
+            SyntaxKind::NON_NULL_TYPE => {
+                cst::Type::NonNullType(cst::NonNullType { syntax: self.syntax_node() })
+            }
             _ => unreachable!("this should only return Type node"),
         }
     }
@@ -148,13 +144,7 @@ impl<T: CstNode> fmt::Debug for SyntaxTree<T> {
                 }
 
                 rowan::NodeOrToken::Token(token) => {
-                    writeln!(
-                        f,
-                        "- {:?}@{:?} {:?}",
-                        kind,
-                        token.text_range(),
-                        token.text()
-                    )
+                    writeln!(f, "- {:?}@{:?} {:?}", kind, token.text_range(), token.text())
                 }
             }
         }
@@ -188,9 +178,7 @@ pub(crate) struct SyntaxTreeBuilder {
 impl SyntaxTreeBuilder {
     /// Create a new instance of `SyntaxBuilder`.
     pub(crate) fn new() -> Self {
-        Self {
-            builder: GreenNodeBuilder::new(),
-        }
+        Self { builder: GreenNodeBuilder::new() }
     }
 
     pub(crate) fn checkpoint(&self) -> rowan::Checkpoint {
@@ -208,8 +196,7 @@ impl SyntaxTreeBuilder {
     }
 
     pub(crate) fn wrap_node(&mut self, checkpoint: rowan::Checkpoint, kind: SyntaxKind) {
-        self.builder
-            .start_node_at(checkpoint, rowan::SyntaxKind(kind as u16));
+        self.builder.start_node_at(checkpoint, rowan::SyntaxKind(kind as u16));
     }
 
     /// Adds new token to the current branch.

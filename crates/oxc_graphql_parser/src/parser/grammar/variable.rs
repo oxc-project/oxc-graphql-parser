@@ -52,12 +52,12 @@ pub(crate) fn variable_definitions(p: &mut Parser) {
 pub(crate) fn variable_definition(p: &mut Parser) {
     let _guard = p.start_node(SyntaxKind::VARIABLE_DEFINITION);
 
-    if p.executable_descriptions_allowed() {
-        if let Some(TokenKind::StringValue) = p.peek() {
-            description::description(p);
-            if p.peek() != Some(T![$]) {
-                return p.err("expected a Variable");
-            }
+    if p.executable_descriptions_allowed()
+        && let Some(TokenKind::StringValue) = p.peek()
+    {
+        description::description(p);
+        if p.peek() != Some(T![$]) {
+            return p.err("expected a Variable");
         }
     }
 
@@ -113,15 +113,8 @@ query GroceryStoreTrip($budget: Int) {
 
         for definition in doc.definitions() {
             if let cst::Definition::OperationDefinition(op_def) = definition {
-                for var in op_def
-                    .variable_definitions()
-                    .unwrap()
-                    .variable_definitions()
-                {
-                    assert_eq!(
-                        var.variable().unwrap().name().unwrap().text().as_ref(),
-                        "budget"
-                    );
+                for var in op_def.variable_definitions().unwrap().variable_definitions() {
+                    assert_eq!(var.variable().unwrap().name().unwrap().text().as_ref(), "budget");
                     if let cst::Type::NamedType(name) = var.ty().unwrap() {
                         assert_eq!(name.name().unwrap().text().as_ref(), "Int")
                     }
@@ -133,21 +126,14 @@ query GroceryStoreTrip($budget: Int) {
     #[test]
     fn it_parses_variable_definition_description_when_enabled() {
         let input = "query Q(\"Budget for the trip\" $budget: Int) { name }";
-        let cst = Parser::new(input)
-            .allow_executable_descriptions(true)
-            .parse();
+        let cst = Parser::new(input).allow_executable_descriptions(true).parse();
 
         assert_eq!(cst.errors().len(), 0);
         let def = cst.document().definitions().next().unwrap();
         let cst::Definition::OperationDefinition(op) = def else {
             panic!("expected an OperationDefinition");
         };
-        let var = op
-            .variable_definitions()
-            .unwrap()
-            .variable_definitions()
-            .next()
-            .unwrap();
+        let var = op.variable_definitions().unwrap().variable_definitions().next().unwrap();
         assert!(var.description().is_some());
     }
 }

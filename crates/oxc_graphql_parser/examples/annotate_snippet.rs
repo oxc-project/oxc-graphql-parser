@@ -32,15 +32,11 @@ fn parse_schema() -> cst::Document {
     // - index (err.index())
     for err in cst.errors() {
         let snippet = Level::ERROR.primary_title(err.message()).element(
-            Snippet::source(&src)
-                .line_start(0)
-                .path(file_name)
-                .fold(true)
-                .annotation(
-                    AnnotationKind::Primary
-                        .span(err.index()..err.index() + err.data().len())
-                        .label(err.message()),
-                ),
+            Snippet::source(&src).line_start(0).path(file_name).fold(true).annotation(
+                AnnotationKind::Primary
+                    .span(err.index()..err.index() + err.data().len())
+                    .label(err.message()),
+            ),
         );
 
         let renderer = Renderer::styled();

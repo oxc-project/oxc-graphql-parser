@@ -5,11 +5,7 @@ static NAMESTART_CHARS: [bool; 256] = namestart_lut();
 
 #[inline]
 pub(crate) fn punctuation_kind(c: char) -> Option<TokenKind> {
-    if c.is_ascii() {
-        PUNCTUATION_CHARS[c as usize]
-    } else {
-        None
-    }
+    if c.is_ascii() { PUNCTUATION_CHARS[c as usize] } else { None }
 }
 
 #[inline]

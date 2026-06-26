@@ -26,20 +26,20 @@ use crate::parser::grammar::variable;
 pub(crate) fn fragment_definition(p: &mut Parser) {
     let _g = p.start_node(SyntaxKind::FRAGMENT_DEFINITION);
 
-    if p.executable_descriptions_allowed() {
-        if let Some(TokenKind::StringValue) = p.peek() {
-            description::description(p);
-        }
+    if p.executable_descriptions_allowed()
+        && let Some(TokenKind::StringValue) = p.peek()
+    {
+        description::description(p);
     }
 
     p.bump(SyntaxKind::fragment_KW);
 
     fragment_name(p);
 
-    if p.legacy_fragment_variables_allowed() {
-        if let Some(T!['(']) = p.peek() {
-            variable::variable_definitions(p);
-        }
+    if p.legacy_fragment_variables_allowed()
+        && let Some(T!['(']) = p.peek()
+    {
+        variable::variable_definitions(p);
     }
 
     type_condition(p);
@@ -144,9 +144,7 @@ mod test {
     #[test]
     fn it_parses_fragment_description_when_enabled() {
         let input = "\"Fragment description\"\nfragment ProfilePic on User { id }";
-        let cst = Parser::new(input)
-            .allow_executable_descriptions(true)
-            .parse();
+        let cst = Parser::new(input).allow_executable_descriptions(true).parse();
 
         assert_eq!(cst.errors().len(), 0);
         let def = cst.document().definitions().next().unwrap();
@@ -159,9 +157,7 @@ mod test {
     #[test]
     fn it_parses_legacy_fragment_variables_when_enabled() {
         let input = "fragment ProfilePic($size: Int = 32) on User { profilePic(size: $size) }";
-        let cst = Parser::new(input)
-            .allow_legacy_fragment_variables(true)
-            .parse();
+        let cst = Parser::new(input).allow_legacy_fragment_variables(true).parse();
 
         assert_eq!(cst.errors().len(), 0);
         let def = cst.document().definitions().next().unwrap();
