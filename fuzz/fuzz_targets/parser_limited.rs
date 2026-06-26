@@ -1,6 +1,6 @@
 #![no_main]
 use libfuzzer_sys::fuzz_target;
-use oxc_graphql::Parser;
+use oxc_graphql_parser::Parser;
 use std::panic;
 
 // Use completely arbitrary input and a token limit to find cases where the limit

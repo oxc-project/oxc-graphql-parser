@@ -1,6 +1,6 @@
 
 [package]
-name = "oxc-graphql-fuzz"
+name = "oxc_graphql_parser_fuzz"
 version = "0.0.1"
 authors = ["Automatically generated"]
 publish = false
@@ -12,7 +12,7 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.4"
-oxc-graphql = { path = "../crates/oxc-graphql" }
+oxc_graphql_parser = { path = "../crates/oxc_graphql_parser" }
 env_logger = "0.11.0"
 
 [[bin]]

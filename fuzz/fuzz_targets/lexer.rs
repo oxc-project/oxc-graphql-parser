@@ -1,6 +1,6 @@
 #![no_main]
 use libfuzzer_sys::fuzz_target;
-use oxc_graphql::Lexer;
+use oxc_graphql_parser::Lexer;
 use std::panic;
 
 fuzz_target!(|data: &str| {

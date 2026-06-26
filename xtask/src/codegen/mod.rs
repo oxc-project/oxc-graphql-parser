@@ -30,11 +30,12 @@ impl Codegen {
         let cst = lower(&grammar);
 
         let syntax_kind_path =
-            root_path().join("crates/oxc-graphql/src/parser/generated/syntax_kind.rs");
+            root_path().join("crates/oxc_graphql_parser/src/parser/generated/syntax_kind.rs");
         let syntax_kinds = generate_kinds(KINDS_SRC);
         ensure_file_contents(syntax_kind_path.as_path(), &syntax_kinds?)?;
 
-        let cst_nodes_file = project_root().join("crates/oxc-graphql/src/cst/generated/nodes.rs");
+        let cst_nodes_file =
+            project_root().join("crates/oxc_graphql_parser/src/cst/generated/nodes.rs");
         let contents = generate_nodes(KINDS_SRC, &cst)?;
         ensure_file_contents(cst_nodes_file.as_path(), &contents)?;
         Ok(())
