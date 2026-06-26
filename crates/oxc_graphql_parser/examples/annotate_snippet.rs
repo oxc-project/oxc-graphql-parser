@@ -1,4 +1,4 @@
-//! This example outlines using oxc_graphql_parser with [annotate-snippets], the error
+//! This example outlines using `oxc-graphql-parser` with [annotate-snippets], the error
 //! printing library used by the Rust compiler.
 //!
 //! This allows for a lot of control over how you would like your error output

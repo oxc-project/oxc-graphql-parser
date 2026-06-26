@@ -116,7 +116,7 @@ enum PendingToken<'input> {
 
 /// Chosen experimentally with:
 ///
-/// * oxc_graphql_parser 0.6.2+ (e05abbf4f)
+/// * oxc-graphql-parser 0.6.2+ (e05abbf4f)
 /// * Rust 1.72.1
 /// * aarch64-apple-darwin
 /// * Unoptimized (default `cargo test` profile)

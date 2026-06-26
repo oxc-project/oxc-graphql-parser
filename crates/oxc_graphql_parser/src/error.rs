@@ -23,12 +23,12 @@ use std::fmt;
 ///
 /// ### Diagnostics
 ///
-/// Using something like [miette crate] along with oxc_graphql_parser lets you have
+/// Using something like [miette crate] along with `oxc-graphql-parser` lets you have
 /// more visual diagnostics. [miette] and [annotate_snippets] examples guide you
-/// through integrating them with oxc_graphql_parser. These are useful if you are
+/// through integrating them with `oxc-graphql-parser`. These are useful if you are
 /// displaying Errors in a terminal-like environment.
 ///
-/// <img src="https://raw.githubusercontent.com/oxc-project/oxc-graphql-parser/main/crates/oxc_graphql_parser/screenshots/oxc_graphql_parser_error.png" alt="A screenshot of an error example produced by using oxc_graphql_parser and miette. The ascii display shows a graphql code snippet with line numbers to the left. Under the code sample there is a line pointing to where a value is missing in graphql code">
+/// <img src="https://raw.githubusercontent.com/oxc-project/oxc-graphql-parser/main/crates/oxc_graphql_parser/screenshots/oxc_graphql_parser_error.png" alt="A screenshot of an error example produced by using oxc-graphql-parser and miette. The ascii display shows a graphql code snippet with line numbers to the left. Under the code sample there is a line pointing to where a value is missing in graphql code">
 ///
 /// [miette]: https://github.com/oxc-project/oxc-graphql-parser/blob/main/crates/oxc_graphql_parser/examples/miette.rs
 /// [annotate_snippets]: https://github.com/oxc-project/oxc-graphql-parser/blob/main/crates/oxc_graphql_parser/examples/annotate_snippet.rs
@@ -95,7 +95,7 @@ impl Error {
     }
 
     /// Get a reference to the error's data. This is usually the token that
-    /// `oxc_graphql_parser` has found to be lexically or syntactically incorrect.
+    /// `oxc-graphql-parser` has found to be lexically or syntactically incorrect.
     pub fn data(&self) -> &str {
         match &self.data {
             ErrorData::Text(text) => text,

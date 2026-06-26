@@ -1,10 +1,10 @@
 [package]
-name = "oxc_graphql_parser"
+name = "oxc-graphql-parser"
 version = "0.0.1" # When bumping, also update README.md
 authors = ["Irina Shestak <shestak.irina@gmail.com>"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/oxc-project/oxc-graphql-parser"
-documentation = "https://docs.rs/oxc_graphql_parser"
+documentation = "https://docs.rs/oxc-graphql-parser"
 description = "Spec-compliant GraphQL parser."
 keywords = ["graphql", "parser", "graphql-tooling", "oxc"]
 categories = [

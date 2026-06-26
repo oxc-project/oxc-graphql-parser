@@ -1,4 +1,4 @@
-//! Example usage of `oxc_graphql_parser` to check for unused vars in a given GraphQL
+//! Example usage of `oxc-graphql-parser` to check for unused vars in a given GraphQL
 //! query.
 
 use oxc_graphql_parser::cst;

@@ -1,4 +1,4 @@
-//! This example describes how to use `oxc_graphql_parser` with
+//! This example describes how to use `oxc-graphql-parser` with
 //! [`ariadne`](https://docs.rs/ariadne/0.3.0/ariadne) diagnostic library.
 
 use ariadne::Label;

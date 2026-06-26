@@ -15,11 +15,11 @@ use std::path::PathBuf;
 
 // To run these tests and update files:
 // ```bash
-// env UPDATE_EXPECT=1 cargo test --package oxc_graphql_parser
+// env UPDATE_EXPECT=1 cargo test --package oxc-graphql-parser
 // ```
 // or on windows
 // ```bash
-// $env:UPDATE_EXPECT=1; cargo test --package oxc_graphql_parser
+// $env:UPDATE_EXPECT=1; cargo test --package oxc-graphql-parser
 // ```
 #[test]
 fn lexer_tests() {
@@ -178,7 +178,7 @@ fn test_data_dir() -> PathBuf {
     project_root().join("oxc_graphql_parser/test_data")
 }
 
-/// oxc_graphql_parser project root.
+/// oxc-graphql-parser project root.
 fn project_root() -> PathBuf {
     Path::new(
         &env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| env!("CARGO_MANIFEST_DIR").to_owned()),

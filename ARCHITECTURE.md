@@ -1,6 +1,6 @@
 # Architecture
 
-This document gives an overview of how `oxc_graphql_parser` works. `oxc_graphql_parser` is intended to encapsulate generic GraphQL tooling in Rust.
+This document gives an overview of how `oxc-graphql-parser` works. `oxc-graphql-parser` is intended to encapsulate generic GraphQL tooling in Rust.
 
 ## Design Principles
 1. **Prioritizing developer experience.** Elegant and ergonomic APIs is the
@@ -23,16 +23,16 @@ or writing out query planning and composition algorithms in Rust. These all have
 quite different requirements when it comes to document manipulation. We wanted to
 make sure we account for them early on.
 
-## `oxc_graphql_parser`
+## `oxc-graphql-parser`
 
-`oxc_graphql_parser` is the parser crate in this repository. Its job is to take GraphQL
+`oxc-graphql-parser` is the parser crate in this repository. Its job is to take GraphQL
 queries or schemas as string input and produce an Concrete Syntax Tree (CST).
-Users of oxc_graphql_parser can then programmatically traverse the CST to get information
+Users of oxc-graphql-parser can then programmatically traverse the CST to get information
 about their input.
 
-There are two main components of `oxc_graphql_parser`: the lexer and the parser.
+There are two main components of `oxc-graphql-parser`: the lexer and the parser.
 
-`oxc_graphql_parser` is a hand-written recursive-descent parser. This is a type of
+`oxc-graphql-parser` is a hand-written recursive-descent parser. This is a type of
 parser that starts from the top of a file and recursively walks its way down
 generating CST nodes along the way. This style of parser is common in
 industrial-strength compilers; for example, Clang and Rustc use this style of
@@ -216,11 +216,11 @@ for definition in document.definitions() {
 }
 ```
 
-[`oxc_graphql_parser`]: https://github.com/oxc-project/oxc-graphql-parser/tree/main/crates/oxc_graphql_parser
+[`oxc-graphql-parser`]: https://github.com/oxc-project/oxc-graphql-parser/tree/main/crates/oxc_graphql_parser
 [`rust-analyzer`]: https://github.com/rust-analyzer/rust-analyzer
 [`rowan`]: https://github.com/rust-analyzer/rowan
 [`ungrammar`]: https://github.com/rust-analyzer/ungrammar
-[oxc_graphql_parser: spec-compliant GraphQL tools in Rust]: https://github.com/oxc-project/oxc-graphql-parser/
+[oxc-graphql-parser: spec-compliant GraphQL tools in Rust]: https://github.com/oxc-project/oxc-graphql-parser/
 [Red/Green tree]: https://blog.yaakov.online/red-green-trees/
 [this post]: https://rust-analyzer.github.io/blog/2020/10/24/introducing-ungrammar.html
 [graphql.ungram]: https://github.com/oxc-project/oxc-graphql-parser/blob/main/graphql.ungram
