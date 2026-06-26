@@ -33,7 +33,7 @@ let input = "union SearchResult = Photo | Person | Cat | Dog";
 let parser = Parser::new(input);
 let cst = parser.parse();
 
-assert!(cst.errors().is_empty());
+assert_eq!(0, cst.errors().len());
 ```
 
 `Parser::parse` always returns a concrete syntax tree, even when lexing or
