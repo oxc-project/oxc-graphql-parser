@@ -800,7 +800,7 @@ impl<'a> Parser<'a> {
 
         let mut locations = self.new_vec();
         loop {
-            if let Some(token) = self.peek_token().cloned()
+            if let Some(token) = self.peek_token().copied()
                 && token.kind() == TokenKind::Name
             {
                 self.bump();
@@ -1258,12 +1258,11 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_name(&mut self) -> Option<Name<'a>> {
-        let token = self.peek_token().cloned()?;
-        if token.kind() != TokenKind::Name {
+        if self.peek()? != TokenKind::Name {
             self.err("expected a Name");
             return None;
         }
-        self.bump();
+        let token = self.bump().expect("peeked Name token must be available");
         Some(Name {
             value: token.data(),
             span: Span::new(token.index(), token.index() + token.data().len()),
@@ -1308,7 +1307,7 @@ impl<'a> Parser<'a> {
     }
 
     fn err(&mut self, message: &str) {
-        let Some(token) = self.peek_token().cloned() else {
+        let Some(token) = self.peek_token().copied() else {
             return;
         };
         let err = if token.kind() == TokenKind::Eof {
@@ -1339,7 +1338,7 @@ impl<'a> Parser<'a> {
 
     fn peek_while(&mut self, mut run: impl FnMut(&mut Parser<'a>, TokenKind) -> ControlFlow<()>) {
         while let Some(kind) = self.peek() {
-            let before = self.current_token.clone();
+            let before = self.current_token;
             match run(self, kind) {
                 ControlFlow::Break(()) => break,
                 ControlFlow::Continue(()) => {
