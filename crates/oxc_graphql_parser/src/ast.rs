@@ -457,6 +457,7 @@ pub struct DirectiveDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub arguments: AstVec<'a, InputValueDefinition<'a>>,
+    pub directives: AstVec<'a, Directive<'a>>,
     pub repeatable: bool,
     pub locations: AstVec<'a, DirectiveLocation<'a>>,
     pub span: Span,

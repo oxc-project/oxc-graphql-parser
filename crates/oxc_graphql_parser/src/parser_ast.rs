@@ -15,6 +15,7 @@ pub struct Parser<'a> {
     accept_errors: bool,
     allow_executable_descriptions: bool,
     experimental_fragment_arguments: bool,
+    experimental_directives_on_directive_definitions: bool,
     last_end: u32,
     /// Reusable scratch stack for building AST lists. List elements are
     /// collected here and copied into the arena once, at the exact final
@@ -67,6 +68,7 @@ impl<'a> Parser<'a> {
             accept_errors: true,
             allow_executable_descriptions: false,
             experimental_fragment_arguments: false,
+            experimental_directives_on_directive_definitions: false,
             last_end: 0,
             scratch: Vec::new(),
         }
@@ -89,6 +91,11 @@ impl<'a> Parser<'a> {
 
     pub fn experimental_fragment_arguments(mut self, allow: bool) -> Self {
         self.experimental_fragment_arguments = allow;
+        self
+    }
+
+    pub fn experimental_directives_on_directive_definitions(mut self, allow: bool) -> Self {
+        self.experimental_directives_on_directive_definitions = allow;
         self
     }
 
@@ -896,6 +903,11 @@ impl<'a> Parser<'a> {
         self.expect(T![@], "expected @ symbol");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let arguments = self.parse_arguments_definition_if_present();
+        let directives = if self.experimental_directives_on_directive_definitions {
+            self.parse_directives(Constness::Const)
+        } else {
+            self.new_vec()
+        };
         let repeatable = if self.peek_data() == Some("repeatable") {
             self.bump();
             true
@@ -909,6 +921,7 @@ impl<'a> Parser<'a> {
             description,
             name,
             arguments,
+            directives,
             repeatable,
             locations,
             span: self.span_from(start),
