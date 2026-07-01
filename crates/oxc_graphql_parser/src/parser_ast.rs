@@ -276,6 +276,10 @@ impl<'a> Parser<'a> {
                 let extension = self.parse_input_object_type_extension_from(start);
                 Definition::InputObjectTypeExtension(self.alloc(extension))
             }
+            Some("directive") if self.experimental_directives_on_directive_definitions => {
+                let extension = self.parse_directive_extension_from(start);
+                Definition::DirectiveExtension(self.alloc(extension))
+            }
             _ => {
                 self.err("expected a valid extension");
                 return None;
@@ -891,6 +895,17 @@ impl<'a> Parser<'a> {
         self.expect(T![:], "expected :");
         let named_type = self.parse_named_type().unwrap_or_else(|| self.missing_named_type());
         RootOperationTypeDefinition { operation_type, named_type, span: self.span_from(start) }
+    }
+
+    fn parse_directive_extension_from(&mut self, start: u32) -> DirectiveExtension<'a> {
+        self.expect_name_value("directive");
+        self.expect(T![@], "expected @ symbol");
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
+        let directives = self.parse_directives(Constness::Const);
+        if directives.is_empty() {
+            self.err("expected Directives");
+        }
+        DirectiveExtension { name, directives, span: self.span_from(start) }
     }
 
     fn parse_directive_definition(
