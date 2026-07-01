@@ -84,8 +84,7 @@ fn parser_parses_selection_set_and_type_roots() {
 fn parser_parses_legacy_fragment_variables() {
     let source = "fragment F($v: Int) on T { f(x: $v) }";
     let allocator = Allocator::default();
-    let ast =
-        Parser::new(&allocator, source).allow_legacy_fragment_variables(true).parse();
+    let ast = Parser::new(&allocator, source).allow_legacy_fragment_variables(true).parse();
     assert_eq!(ast.errors().len(), 0);
 
     let ast::Definition::Fragment(fragment) = &ast.document().definitions[0] else {
