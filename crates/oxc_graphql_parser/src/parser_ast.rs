@@ -183,7 +183,14 @@ impl<'a> Parser<'a> {
                 let definition = self.parse_enum_type_definition(description);
                 Definition::EnumType(self.alloc(definition))
             }
-            "extend" => return self.parse_extension(),
+            "extend" => {
+                if description.is_some() {
+                    self.err(
+                        "Unexpected description, only GraphQL definitions support descriptions.",
+                    );
+                }
+                return self.parse_extension();
+            }
             "fragment" => {
                 let definition = self.parse_fragment_definition(description);
                 Definition::Fragment(self.alloc(definition))
@@ -200,7 +207,16 @@ impl<'a> Parser<'a> {
                 let definition = self.parse_object_type_definition(description);
                 Definition::ObjectType(self.alloc(definition))
             }
-            "query" | "mutation" | "subscription" | "{" => {
+            "{" => {
+                if description.is_some() {
+                    self.err(
+                        "Unexpected description, descriptions are not supported on shorthand queries.",
+                    );
+                }
+                let definition = self.parse_operation_definition(description);
+                Definition::Operation(self.alloc(definition))
+            }
+            "query" | "mutation" | "subscription" => {
                 let definition = self.parse_operation_definition(description);
                 Definition::Operation(self.alloc(definition))
             }
