@@ -214,23 +214,23 @@ pub enum OperationType {
 
 #[derive(Debug, PartialEq)]
 pub struct OperationDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub operation_type: OperationType,
     pub name: Option<Name<'a>>,
     pub variable_definitions: AstVec<'a, VariableDefinition<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub selection_set: Option<SelectionSet<'a>>,
+    pub selection_set: Option<&'a SelectionSet<'a>>,
     pub span: Span,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct FragmentDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub name: Name<'a>,
     pub variable_definitions: AstVec<'a, VariableDefinition<'a>>,
     pub type_condition: NamedType<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub selection_set: Option<SelectionSet<'a>>,
+    pub selection_set: Option<&'a SelectionSet<'a>>,
     pub span: Span,
 }
 
@@ -266,7 +266,7 @@ pub struct Field<'a> {
     pub name: Name<'a>,
     pub arguments: AstVec<'a, Argument<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub selection_set: Option<SelectionSet<'a>>,
+    pub selection_set: Option<&'a SelectionSet<'a>>,
     pub span: Span,
 }
 
@@ -281,13 +281,13 @@ pub struct FragmentSpread<'a> {
 pub struct InlineFragment<'a> {
     pub type_condition: Option<NamedType<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub selection_set: Option<SelectionSet<'a>>,
+    pub selection_set: Option<&'a SelectionSet<'a>>,
     pub span: Span,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct VariableDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub variable: Variable<'a>,
     pub ty: Option<Type<'a>>,
     pub default_value: Option<Value<'a>>,
@@ -443,7 +443,7 @@ impl PartialEq for NonNullType<'_> {
 
 #[derive(Debug, PartialEq)]
 pub struct SchemaDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub root_operations: AstVec<'a, RootOperationTypeDefinition<'a>>,
     pub span: Span,
@@ -465,7 +465,7 @@ pub struct RootOperationTypeDefinition<'a> {
 
 #[derive(Debug, PartialEq)]
 pub struct DirectiveDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub name: Name<'a>,
     pub arguments: AstVec<'a, InputValueDefinition<'a>>,
     pub repeatable: bool,
@@ -481,7 +481,7 @@ pub struct DirectiveLocation<'a> {
 
 #[derive(Debug, PartialEq)]
 pub struct ScalarTypeDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub span: Span,
@@ -496,7 +496,7 @@ pub struct ScalarTypeExtension<'a> {
 
 #[derive(Debug, PartialEq)]
 pub struct ObjectTypeDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub name: Name<'a>,
     pub interfaces: AstVec<'a, NamedType<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
@@ -515,7 +515,7 @@ pub struct ObjectTypeExtension<'a> {
 
 #[derive(Debug, PartialEq)]
 pub struct InterfaceTypeDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub name: Name<'a>,
     pub interfaces: AstVec<'a, NamedType<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
@@ -534,7 +534,7 @@ pub struct InterfaceTypeExtension<'a> {
 
 #[derive(Debug, PartialEq)]
 pub struct UnionTypeDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub members: AstVec<'a, NamedType<'a>>,
@@ -551,7 +551,7 @@ pub struct UnionTypeExtension<'a> {
 
 #[derive(Debug, PartialEq)]
 pub struct EnumTypeDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub values: AstVec<'a, EnumValueDefinition<'a>>,
@@ -568,7 +568,7 @@ pub struct EnumTypeExtension<'a> {
 
 #[derive(Debug, PartialEq)]
 pub struct EnumValueDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub value: EnumValue<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub span: Span,
@@ -576,7 +576,7 @@ pub struct EnumValueDefinition<'a> {
 
 #[derive(Debug, PartialEq)]
 pub struct InputObjectTypeDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub fields: AstVec<'a, InputValueDefinition<'a>>,
@@ -593,7 +593,7 @@ pub struct InputObjectTypeExtension<'a> {
 
 #[derive(Debug, PartialEq)]
 pub struct FieldDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub name: Name<'a>,
     pub arguments: AstVec<'a, InputValueDefinition<'a>>,
     pub ty: Option<Type<'a>>,
@@ -603,7 +603,7 @@ pub struct FieldDefinition<'a> {
 
 #[derive(Debug, PartialEq)]
 pub struct InputValueDefinition<'a> {
-    pub description: Option<StringValue<'a>>,
+    pub description: Option<&'a StringValue<'a>>,
     pub name: Name<'a>,
     pub ty: Option<Type<'a>>,
     pub default_value: Option<Value<'a>>,
