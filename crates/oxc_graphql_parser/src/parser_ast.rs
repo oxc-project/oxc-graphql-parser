@@ -120,6 +120,10 @@ impl<'a> Parser<'a> {
         ArenaVec::new_in(&self.allocator)
     }
 
+    fn alloc<T>(&self, value: T) -> ArenaBox<'a, T> {
+        ArenaBox::new_in(value, &self.allocator)
+    }
+
     /// Marks the start of a new scratch-built list, pre-sizing the stack so
     /// small parses pay for at most one scratch allocation.
     fn scratch_mark(&mut self) -> usize {
@@ -178,23 +182,47 @@ impl<'a> Parser<'a> {
         let selector = self.peek_data()?;
 
         let definition = match selector {
-            "directive" => Definition::Directive(self.parse_directive_definition(description)),
-            "enum" => Definition::EnumType(self.parse_enum_type_definition(description)),
+            "directive" => {
+                let definition = self.parse_directive_definition(description);
+                Definition::Directive(self.alloc(definition))
+            }
+            "enum" => {
+                let definition = self.parse_enum_type_definition(description);
+                Definition::EnumType(self.alloc(definition))
+            }
             "extend" => return self.parse_extension(),
-            "fragment" => Definition::Fragment(self.parse_fragment_definition(description)),
+            "fragment" => {
+                let definition = self.parse_fragment_definition(description);
+                Definition::Fragment(self.alloc(definition))
+            }
             "input" => {
-                Definition::InputObjectType(self.parse_input_object_type_definition(description))
+                let definition = self.parse_input_object_type_definition(description);
+                Definition::InputObjectType(self.alloc(definition))
             }
             "interface" => {
-                Definition::InterfaceType(self.parse_interface_type_definition(description))
+                let definition = self.parse_interface_type_definition(description);
+                Definition::InterfaceType(self.alloc(definition))
             }
-            "type" => Definition::ObjectType(self.parse_object_type_definition(description)),
+            "type" => {
+                let definition = self.parse_object_type_definition(description);
+                Definition::ObjectType(self.alloc(definition))
+            }
             "query" | "mutation" | "subscription" | "{" => {
-                Definition::Operation(self.parse_operation_definition(description))
+                let definition = self.parse_operation_definition(description);
+                Definition::Operation(self.alloc(definition))
             }
-            "scalar" => Definition::ScalarType(self.parse_scalar_type_definition(description)),
-            "schema" => Definition::Schema(self.parse_schema_definition(description)),
-            "union" => Definition::UnionType(self.parse_union_type_definition(description)),
+            "scalar" => {
+                let definition = self.parse_scalar_type_definition(description);
+                Definition::ScalarType(self.alloc(definition))
+            }
+            "schema" => {
+                let definition = self.parse_schema_definition(description);
+                Definition::Schema(self.alloc(definition))
+            }
+            "union" => {
+                let definition = self.parse_union_type_definition(description);
+                Definition::UnionType(self.alloc(definition))
+            }
             _ => {
                 if description.is_some() {
                     self.err("expected a definition after this StringValue");
@@ -213,25 +241,34 @@ impl<'a> Parser<'a> {
         self.expect_name_value("extend");
 
         let definition = match self.peek_data() {
-            Some("schema") => Definition::SchemaExtension(self.parse_schema_extension_from(start)),
+            Some("schema") => {
+                let extension = self.parse_schema_extension_from(start);
+                Definition::SchemaExtension(self.alloc(extension))
+            }
             Some("scalar") => {
-                Definition::ScalarTypeExtension(self.parse_scalar_type_extension_from(start))
+                let extension = self.parse_scalar_type_extension_from(start);
+                Definition::ScalarTypeExtension(self.alloc(extension))
             }
             Some("type") => {
-                Definition::ObjectTypeExtension(self.parse_object_type_extension_from(start))
+                let extension = self.parse_object_type_extension_from(start);
+                Definition::ObjectTypeExtension(self.alloc(extension))
             }
             Some("interface") => {
-                Definition::InterfaceTypeExtension(self.parse_interface_type_extension_from(start))
+                let extension = self.parse_interface_type_extension_from(start);
+                Definition::InterfaceTypeExtension(self.alloc(extension))
             }
             Some("union") => {
-                Definition::UnionTypeExtension(self.parse_union_type_extension_from(start))
+                let extension = self.parse_union_type_extension_from(start);
+                Definition::UnionTypeExtension(self.alloc(extension))
             }
             Some("enum") => {
-                Definition::EnumTypeExtension(self.parse_enum_type_extension_from(start))
+                let extension = self.parse_enum_type_extension_from(start);
+                Definition::EnumTypeExtension(self.alloc(extension))
             }
-            Some("input") => Definition::InputObjectTypeExtension(
-                self.parse_input_object_type_extension_from(start),
-            ),
+            Some("input") => {
+                let extension = self.parse_input_object_type_extension_from(start);
+                Definition::InputObjectTypeExtension(self.alloc(extension))
+            }
             _ => {
                 self.err("expected a valid extension");
                 return None;
@@ -243,7 +280,7 @@ impl<'a> Parser<'a> {
 
     fn parse_operation_definition(
         &mut self,
-        description: Option<&'a StringValue<'a>>,
+        description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> OperationDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -303,7 +340,7 @@ impl<'a> Parser<'a> {
 
     fn parse_fragment_definition(
         &mut self,
-        description: Option<&'a StringValue<'a>>,
+        description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> FragmentDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -337,9 +374,9 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn parse_alloc_selection_set(&mut self) -> &'a SelectionSet<'a> {
+    fn parse_alloc_selection_set(&mut self) -> ArenaBox<'a, SelectionSet<'a>> {
         let selection_set = self.parse_selection_set_inner();
-        self.allocator.alloc(selection_set)
+        self.alloc(selection_set)
     }
 
     fn parse_selection_set_inner(&mut self) -> SelectionSet<'a> {
@@ -384,7 +421,8 @@ impl<'a> Parser<'a> {
         if self.peek() == Some(T![...]) {
             self.parse_fragment_selection()
         } else {
-            Selection::Field(self.parse_field())
+            let field = self.parse_field();
+            Selection::Field(self.alloc(field))
         }
     }
 
@@ -402,12 +440,12 @@ impl<'a> Parser<'a> {
                 self.err("expected a Selection Set");
                 None
             };
-            return Selection::InlineFragment(InlineFragment {
+            return Selection::InlineFragment(self.alloc(InlineFragment {
                 type_condition,
                 directives,
                 selection_set,
                 span: self.span_from(start),
-            });
+            }));
         }
 
         if matches!(self.peek(), Some(T![@] | T!['{'])) {
@@ -418,17 +456,21 @@ impl<'a> Parser<'a> {
                 self.err("expected a Selection Set");
                 None
             };
-            return Selection::InlineFragment(InlineFragment {
+            return Selection::InlineFragment(self.alloc(InlineFragment {
                 type_condition: None,
                 directives,
                 selection_set,
                 span: self.span_from(start),
-            });
+            }));
         }
 
         let name = self.parse_name().unwrap_or_else(|| self.missing_name("fragment spread"));
         let directives = self.parse_directives(Constness::NotConst);
-        Selection::FragmentSpread(FragmentSpread { name, directives, span: self.span_from(start) })
+        Selection::FragmentSpread(self.alloc(FragmentSpread {
+            name,
+            directives,
+            span: self.span_from(start),
+        }))
     }
 
     fn parse_field(&mut self) -> Field<'a> {
@@ -608,14 +650,17 @@ impl<'a> Parser<'a> {
                 if matches!(constness, Constness::Const) {
                     self.err("unexpected variable value in a Const context");
                 }
-                self.parse_variable()
-                    .map_or_else(|| Value::Missing(self.current_span()), Value::Variable)
+                match self.parse_variable() {
+                    Some(variable) => Value::Variable(self.alloc(variable)),
+                    None => Value::Missing(self.current_span()),
+                }
             }
             Some(TokenKind::Int) => self.parse_int_value(),
             Some(TokenKind::Float) => self.parse_float_value(),
-            Some(TokenKind::StringValue) => self
-                .parse_string_value()
-                .map_or_else(|| Value::Missing(self.current_span()), Value::String),
+            Some(TokenKind::StringValue) => match self.parse_string_value() {
+                Some(value) => Value::String(self.alloc(value)),
+                None => Value::Missing(self.current_span()),
+            },
             Some(TokenKind::Name) => self.parse_name_value(),
             Some(T!['[']) => self.parse_list_value(constness),
             Some(T!['{']) => self.parse_object_value(constness),
@@ -633,12 +678,12 @@ impl<'a> Parser<'a> {
 
     fn parse_int_value(&mut self) -> Value<'a> {
         let token = self.bump().expect("peeked int token must be available");
-        Value::Int(IntValue { raw: token.data(), span: token_span(&token) })
+        Value::Int(self.alloc(IntValue { raw: token.data(), span: token_span(&token) }))
     }
 
     fn parse_float_value(&mut self) -> Value<'a> {
         let token = self.bump().expect("peeked float token must be available");
-        Value::Float(FloatValue { raw: token.data(), span: token_span(&token) })
+        Value::Float(self.alloc(FloatValue { raw: token.data(), span: token_span(&token) }))
     }
 
     fn parse_name_value(&mut self) -> Value<'a> {
@@ -646,10 +691,10 @@ impl<'a> Parser<'a> {
             return Value::Missing(self.current_span());
         };
         match name.value {
-            "true" => Value::Boolean(BooleanValue { value: true, span: name.span }),
-            "false" => Value::Boolean(BooleanValue { value: false, span: name.span }),
-            "null" => Value::Null(NullValue { span: name.span }),
-            _ => Value::Enum(EnumValue { name }),
+            "true" => Value::Boolean(self.alloc(BooleanValue { value: true, span: name.span })),
+            "false" => Value::Boolean(self.alloc(BooleanValue { value: false, span: name.span })),
+            "null" => Value::Null(self.alloc(NullValue { span: name.span })),
+            _ => Value::Enum(self.alloc(EnumValue { name })),
         }
     }
 
@@ -678,7 +723,7 @@ impl<'a> Parser<'a> {
             }
         });
 
-        Value::List(ListValue { values, span: self.span_from(start) })
+        Value::List(self.alloc(ListValue { values, span: self.span_from(start) }))
     }
 
     fn parse_object_value(&mut self, constness: Constness) -> Value<'a> {
@@ -705,7 +750,7 @@ impl<'a> Parser<'a> {
             }
         });
 
-        Value::Object(ObjectValue { fields, span: self.span_from(start) })
+        Value::Object(self.alloc(ObjectValue { fields, span: self.span_from(start) }))
     }
 
     fn parse_object_field(&mut self, constness: Constness) -> ObjectField<'a> {
@@ -733,14 +778,11 @@ impl<'a> Parser<'a> {
                 let inner = self.parse_type_inner().unwrap_or(Type::Missing(self.current_span()));
                 self.recursion_limit.decrement();
                 self.expect(T![']'], "expected ]");
-                Type::List(ListType {
-                    ty: ArenaBox::new_in(inner, &self.allocator),
-                    span: self.span_from(start),
-                })
+                Type::List(self.alloc(ListType { ty: inner, span: self.span_from(start) }))
             }
             Some(TokenKind::Name) => {
                 let name = self.parse_name().unwrap_or_else(|| self.missing_name("type"));
-                Type::Named(NamedType { name })
+                Type::Named(self.alloc(NamedType { name }))
             }
             Some(_) => {
                 self.err("expected a type");
@@ -751,10 +793,7 @@ impl<'a> Parser<'a> {
 
         if self.peek() == Some(T![!]) {
             self.bump();
-            ty = Type::NonNull(NonNullType {
-                ty: ArenaBox::new_in(ty, &self.allocator),
-                span: self.span_from(start),
-            });
+            ty = Type::NonNull(self.alloc(NonNullType { ty, span: self.span_from(start) }));
         }
 
         Some(ty)
@@ -766,7 +805,7 @@ impl<'a> Parser<'a> {
 
     fn parse_schema_definition(
         &mut self,
-        description: Option<&'a StringValue<'a>>,
+        description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> SchemaDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -843,7 +882,7 @@ impl<'a> Parser<'a> {
 
     fn parse_directive_definition(
         &mut self,
-        description: Option<&'a StringValue<'a>>,
+        description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> DirectiveDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -898,7 +937,7 @@ impl<'a> Parser<'a> {
 
     fn parse_scalar_type_definition(
         &mut self,
-        description: Option<&'a StringValue<'a>>,
+        description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> ScalarTypeDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -920,7 +959,7 @@ impl<'a> Parser<'a> {
 
     fn parse_object_type_definition(
         &mut self,
-        description: Option<&'a StringValue<'a>>,
+        description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> ObjectTypeDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -953,7 +992,7 @@ impl<'a> Parser<'a> {
 
     fn parse_interface_type_definition(
         &mut self,
-        description: Option<&'a StringValue<'a>>,
+        description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> InterfaceTypeDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -1132,7 +1171,7 @@ impl<'a> Parser<'a> {
 
     fn parse_union_type_definition(
         &mut self,
-        description: Option<&'a StringValue<'a>>,
+        description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> UnionTypeDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -1184,7 +1223,7 @@ impl<'a> Parser<'a> {
 
     fn parse_enum_type_definition(
         &mut self,
-        description: Option<&'a StringValue<'a>>,
+        description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> EnumTypeDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -1252,7 +1291,7 @@ impl<'a> Parser<'a> {
 
     fn parse_input_object_type_definition(
         &mut self,
-        description: Option<&'a StringValue<'a>>,
+        description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> InputObjectTypeDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -1320,10 +1359,10 @@ impl<'a> Parser<'a> {
         })
     }
 
-    fn parse_description_if_present(&mut self) -> Option<&'a StringValue<'a>> {
+    fn parse_description_if_present(&mut self) -> Option<ArenaBox<'a, StringValue<'a>>> {
         if self.peek() == Some(TokenKind::StringValue) {
             let value = self.parse_string_value()?;
-            Some(self.allocator.alloc(value))
+            Some(self.alloc(value))
         } else {
             None
         }
