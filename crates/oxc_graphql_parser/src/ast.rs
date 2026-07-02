@@ -610,3 +610,38 @@ pub struct InputValueDefinition<'a> {
     pub directives: AstVec<'a, Directive<'a>>,
     pub span: Span,
 }
+
+/// Compile-time size gates for the memory-sensitive AST nodes, in the style
+/// of `oxc_ast`'s `assert_layouts.rs`.
+///
+/// AST nodes are bulk data: parsers allocate thousands of them per document,
+/// so a size regression here is a memory and cache regression everywhere.
+/// If an intentional layout change trips these, update the constants.
+#[cfg(target_pointer_width = "64")]
+const _: () = {
+    use std::mem::size_of;
+
+    assert!(size_of::<Span>() == 8);
+    assert!(size_of::<Name>() == 24);
+    assert!(size_of::<StringValue>() == 48);
+
+    assert!(size_of::<Definition>() == 128);
+    assert!(size_of::<OperationDefinition>() == 104);
+    assert!(size_of::<FragmentDefinition>() == 120);
+
+    assert!(size_of::<SelectionSet>() == 32);
+    assert!(size_of::<Selection>() == 120);
+    assert!(size_of::<Field>() == 112);
+    assert!(size_of::<InlineFragment>() == 64);
+
+    assert!(size_of::<Value>() == 48);
+    assert!(size_of::<Argument>() == 80);
+    assert!(size_of::<ObjectField>() == 80);
+    assert!(size_of::<Directive>() == 56);
+    assert!(size_of::<Type>() == 32);
+
+    assert!(size_of::<FieldDefinition>() == 120);
+    assert!(size_of::<InputValueDefinition>() == 144);
+    assert!(size_of::<VariableDefinition>() == 152);
+    assert!(size_of::<EnumValueDefinition>() == 64);
+};
