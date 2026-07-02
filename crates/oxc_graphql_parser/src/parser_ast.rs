@@ -243,13 +243,13 @@ impl<'a> Parser<'a> {
 
     fn parse_operation_definition(
         &mut self,
-        description: Option<StringValue<'a>>,
+        description: Option<&'a StringValue<'a>>,
     ) -> OperationDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
 
         if self.peek() == Some(T!['{']) {
-            let selection_set = Some(self.parse_selection_set_inner());
+            let selection_set = Some(self.parse_alloc_selection_set());
             return OperationDefinition {
                 description,
                 operation_type: OperationType::Query,
@@ -284,7 +284,7 @@ impl<'a> Parser<'a> {
         let variable_definitions = self.parse_variable_definitions_if_present();
         let directives = self.parse_directives(Constness::NotConst);
         let selection_set = if self.peek() == Some(T!['{']) {
-            Some(self.parse_selection_set_inner())
+            Some(self.parse_alloc_selection_set())
         } else {
             self.err("expected a Selection Set");
             None
@@ -303,7 +303,7 @@ impl<'a> Parser<'a> {
 
     fn parse_fragment_definition(
         &mut self,
-        description: Option<StringValue<'a>>,
+        description: Option<&'a StringValue<'a>>,
     ) -> FragmentDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -320,7 +320,7 @@ impl<'a> Parser<'a> {
         let type_condition = self.parse_named_type().unwrap_or_else(|| self.missing_named_type());
         let directives = self.parse_directives(Constness::NotConst);
         let selection_set = if self.peek() == Some(T!['{']) {
-            Some(self.parse_selection_set_inner())
+            Some(self.parse_alloc_selection_set())
         } else {
             self.err("expected a Selection Set");
             None
@@ -335,6 +335,11 @@ impl<'a> Parser<'a> {
             selection_set,
             span: self.span_from(start),
         }
+    }
+
+    fn parse_alloc_selection_set(&mut self) -> &'a SelectionSet<'a> {
+        let selection_set = self.parse_selection_set_inner();
+        self.allocator.alloc(selection_set)
     }
 
     fn parse_selection_set_inner(&mut self) -> SelectionSet<'a> {
@@ -392,7 +397,7 @@ impl<'a> Parser<'a> {
             let type_condition = self.parse_named_type();
             let directives = self.parse_directives(Constness::NotConst);
             let selection_set = if self.peek() == Some(T!['{']) {
-                Some(self.parse_selection_set_inner())
+                Some(self.parse_alloc_selection_set())
             } else {
                 self.err("expected a Selection Set");
                 None
@@ -408,7 +413,7 @@ impl<'a> Parser<'a> {
         if matches!(self.peek(), Some(T![@] | T!['{'])) {
             let directives = self.parse_directives(Constness::NotConst);
             let selection_set = if self.peek() == Some(T!['{']) {
-                Some(self.parse_selection_set_inner())
+                Some(self.parse_alloc_selection_set())
             } else {
                 self.err("expected a Selection Set");
                 None
@@ -440,7 +445,7 @@ impl<'a> Parser<'a> {
         let arguments = self.parse_arguments_if_present(Constness::NotConst);
         let directives = self.parse_directives(Constness::NotConst);
         let selection_set = if self.peek() == Some(T!['{']) {
-            Some(self.parse_selection_set_inner())
+            Some(self.parse_alloc_selection_set())
         } else {
             None
         };
@@ -761,7 +766,7 @@ impl<'a> Parser<'a> {
 
     fn parse_schema_definition(
         &mut self,
-        description: Option<StringValue<'a>>,
+        description: Option<&'a StringValue<'a>>,
     ) -> SchemaDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -838,7 +843,7 @@ impl<'a> Parser<'a> {
 
     fn parse_directive_definition(
         &mut self,
-        description: Option<StringValue<'a>>,
+        description: Option<&'a StringValue<'a>>,
     ) -> DirectiveDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -893,7 +898,7 @@ impl<'a> Parser<'a> {
 
     fn parse_scalar_type_definition(
         &mut self,
-        description: Option<StringValue<'a>>,
+        description: Option<&'a StringValue<'a>>,
     ) -> ScalarTypeDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -915,7 +920,7 @@ impl<'a> Parser<'a> {
 
     fn parse_object_type_definition(
         &mut self,
-        description: Option<StringValue<'a>>,
+        description: Option<&'a StringValue<'a>>,
     ) -> ObjectTypeDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -948,7 +953,7 @@ impl<'a> Parser<'a> {
 
     fn parse_interface_type_definition(
         &mut self,
-        description: Option<StringValue<'a>>,
+        description: Option<&'a StringValue<'a>>,
     ) -> InterfaceTypeDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -1127,7 +1132,7 @@ impl<'a> Parser<'a> {
 
     fn parse_union_type_definition(
         &mut self,
-        description: Option<StringValue<'a>>,
+        description: Option<&'a StringValue<'a>>,
     ) -> UnionTypeDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -1179,7 +1184,7 @@ impl<'a> Parser<'a> {
 
     fn parse_enum_type_definition(
         &mut self,
-        description: Option<StringValue<'a>>,
+        description: Option<&'a StringValue<'a>>,
     ) -> EnumTypeDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -1247,7 +1252,7 @@ impl<'a> Parser<'a> {
 
     fn parse_input_object_type_definition(
         &mut self,
-        description: Option<StringValue<'a>>,
+        description: Option<&'a StringValue<'a>>,
     ) -> InputObjectTypeDefinition<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
@@ -1315,8 +1320,13 @@ impl<'a> Parser<'a> {
         })
     }
 
-    fn parse_description_if_present(&mut self) -> Option<StringValue<'a>> {
-        if self.peek() == Some(TokenKind::StringValue) { self.parse_string_value() } else { None }
+    fn parse_description_if_present(&mut self) -> Option<&'a StringValue<'a>> {
+        if self.peek() == Some(TokenKind::StringValue) {
+            let value = self.parse_string_value()?;
+            Some(self.allocator.alloc(value))
+        } else {
+            None
+        }
     }
 
     fn parse_string_value(&mut self) -> Option<StringValue<'a>> {
