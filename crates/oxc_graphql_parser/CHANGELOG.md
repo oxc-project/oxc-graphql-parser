@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4](https://github.com/oxc-project/oxc-graphql-parser/compare/oxc-graphql-parser-v0.0.3...oxc-graphql-parser-v0.0.4) - 2026-07-02
+
+### Added
+
+- collect comment and expose ([#24](https://github.com/oxc-project/oxc-graphql-parser/pull/24))
+
+### Other
+
+- implement span getter for enum ([#25](https://github.com/oxc-project/oxc-graphql-parser/pull/25))
+
 ## [0.0.3](https://github.com/oxc-project/oxc-graphql-parser/compare/oxc-graphql-parser-v0.0.2...oxc-graphql-parser-v0.0.3) - 2026-07-02
 
 ### Fixed
