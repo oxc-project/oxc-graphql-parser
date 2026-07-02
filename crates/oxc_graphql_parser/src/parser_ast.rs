@@ -345,7 +345,7 @@ impl<'a> Parser<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
         self.expect_name_value("fragment");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("fragment"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
 
         let variable_definitions = if self.allow_legacy_fragment_variables {
             self.parse_variable_definitions_if_present()
@@ -464,7 +464,7 @@ impl<'a> Parser<'a> {
             }));
         }
 
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("fragment spread"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::NotConst);
         Selection::FragmentSpread(self.alloc(FragmentSpread {
             name,
@@ -475,10 +475,10 @@ impl<'a> Parser<'a> {
 
     fn parse_field(&mut self) -> Field<'a> {
         let start = self.current_start();
-        let first_name = self.parse_name().unwrap_or_else(|| self.missing_name("field"));
+        let first_name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let (alias, name) = if self.peek() == Some(T![:]) {
             self.bump();
-            let name = self.parse_name().unwrap_or_else(|| self.missing_name("field"));
+            let name = self.parse_name().unwrap_or_else(|| self.missing_name());
             (Some(first_name), name)
         } else {
             (None, first_name)
@@ -529,7 +529,7 @@ impl<'a> Parser<'a> {
 
     fn parse_argument(&mut self, constness: Constness) -> Argument<'a> {
         let start = self.current_start();
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("argument"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let value = if self.peek() == Some(T![:]) {
             self.bump();
             Some(self.parse_value(constness, false))
@@ -616,7 +616,7 @@ impl<'a> Parser<'a> {
             return None;
         }
         self.bump();
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("variable"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         Some(Variable { name, span: self.span_from(start) })
     }
 
@@ -639,7 +639,7 @@ impl<'a> Parser<'a> {
     fn parse_directive(&mut self, constness: Constness) -> Directive<'a> {
         let start = self.current_start();
         self.expect(T![@], "expected @ symbol");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("directive"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let arguments = self.parse_arguments_if_present(constness);
         Directive { name, arguments, span: self.span_from(start) }
     }
@@ -755,7 +755,7 @@ impl<'a> Parser<'a> {
 
     fn parse_object_field(&mut self, constness: Constness) -> ObjectField<'a> {
         let start = self.current_start();
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("object field"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let value = if self.peek() == Some(T![:]) {
             self.bump();
             Some(self.parse_value(constness, true))
@@ -781,7 +781,7 @@ impl<'a> Parser<'a> {
                 Type::List(self.alloc(ListType { ty: inner, span: self.span_from(start) }))
             }
             Some(TokenKind::Name) => {
-                let name = self.parse_name().unwrap_or_else(|| self.missing_name("type"));
+                let name = self.parse_name().unwrap_or_else(|| self.missing_name());
                 Type::Named(self.alloc(NamedType { name }))
             }
             Some(_) => {
@@ -888,7 +888,7 @@ impl<'a> Parser<'a> {
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
         self.expect_name_value("directive");
         self.expect(T![@], "expected @ symbol");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("directive"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let arguments = self.parse_arguments_definition_if_present();
         let repeatable = if self.peek_data() == Some("repeatable") {
             self.bump();
@@ -942,14 +942,14 @@ impl<'a> Parser<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
         self.expect_name_value("scalar");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("scalar"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
         ScalarTypeDefinition { description, name, directives, span: self.span_from(start) }
     }
 
     fn parse_scalar_type_extension_from(&mut self, start: u32) -> ScalarTypeExtension<'a> {
         self.expect_name_value("scalar");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("scalar"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
         if directives.is_empty() {
             self.err("expected Directives");
@@ -964,7 +964,7 @@ impl<'a> Parser<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
         self.expect_name_value("type");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("object type"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let interfaces = self.parse_implements_interfaces();
         let directives = self.parse_directives(Constness::Const);
         let fields = self.parse_fields_definition_if_present();
@@ -980,7 +980,7 @@ impl<'a> Parser<'a> {
 
     fn parse_object_type_extension_from(&mut self, start: u32) -> ObjectTypeExtension<'a> {
         self.expect_name_value("type");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("object type"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let interfaces = self.parse_implements_interfaces();
         let directives = self.parse_directives(Constness::Const);
         let fields = self.parse_fields_definition_if_present();
@@ -997,7 +997,7 @@ impl<'a> Parser<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
         self.expect_name_value("interface");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("interface"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let interfaces = self.parse_implements_interfaces();
         let directives = self.parse_directives(Constness::Const);
         let fields = self.parse_fields_definition_if_present();
@@ -1013,7 +1013,7 @@ impl<'a> Parser<'a> {
 
     fn parse_interface_type_extension_from(&mut self, start: u32) -> InterfaceTypeExtension<'a> {
         self.expect_name_value("interface");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("interface"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let interfaces = self.parse_implements_interfaces();
         let directives = self.parse_directives(Constness::Const);
         let fields = self.parse_fields_definition_if_present();
@@ -1089,7 +1089,7 @@ impl<'a> Parser<'a> {
     fn parse_field_definition(&mut self) -> FieldDefinition<'a> {
         let start = self.current_start();
         let description = self.parse_description_if_present();
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("field definition"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let arguments = self.parse_arguments_definition_if_present();
         let ty = if self.peek() == Some(T![:]) {
             self.bump();
@@ -1144,7 +1144,7 @@ impl<'a> Parser<'a> {
     fn parse_input_value_definition(&mut self) -> InputValueDefinition<'a> {
         let start = self.current_start();
         let description = self.parse_description_if_present();
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("input value"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let ty = if self.peek() == Some(T![:]) {
             self.bump();
             self.parse_type_inner()
@@ -1176,7 +1176,7 @@ impl<'a> Parser<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
         self.expect_name_value("union");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("union"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
         let members = self.parse_union_members_if_present();
         UnionTypeDefinition { description, name, directives, members, span: self.span_from(start) }
@@ -1184,7 +1184,7 @@ impl<'a> Parser<'a> {
 
     fn parse_union_type_extension_from(&mut self, start: u32) -> UnionTypeExtension<'a> {
         self.expect_name_value("union");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("union"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
         let members = self.parse_union_members_if_present();
         if directives.is_empty() && members.is_empty() {
@@ -1228,7 +1228,7 @@ impl<'a> Parser<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
         self.expect_name_value("enum");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("enum"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
         let values = self.parse_enum_values_definition_if_present();
         EnumTypeDefinition { description, name, directives, values, span: self.span_from(start) }
@@ -1236,7 +1236,7 @@ impl<'a> Parser<'a> {
 
     fn parse_enum_type_extension_from(&mut self, start: u32) -> EnumTypeExtension<'a> {
         self.expect_name_value("enum");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("enum"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
         let values = self.parse_enum_values_definition_if_present();
         if directives.is_empty() && values.is_empty() {
@@ -1279,9 +1279,7 @@ impl<'a> Parser<'a> {
     fn parse_enum_value_definition(&mut self) -> EnumValueDefinition<'a> {
         let start = self.current_start();
         let description = self.parse_description_if_present();
-        let value = EnumValue {
-            name: self.parse_name().unwrap_or_else(|| self.missing_name("enum value")),
-        };
+        let value = EnumValue { name: self.parse_name().unwrap_or_else(|| self.missing_name()) };
         if matches!(value.name.as_str(), "true" | "false" | "null") {
             self.err("invalid Enum Value");
         }
@@ -1296,7 +1294,7 @@ impl<'a> Parser<'a> {
         let start =
             description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
         self.expect_name_value("input");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("input object"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
         let fields = self.parse_input_fields_definition_if_present();
         InputObjectTypeDefinition {
@@ -1313,7 +1311,7 @@ impl<'a> Parser<'a> {
         start: u32,
     ) -> InputObjectTypeExtension<'a> {
         self.expect_name_value("input");
-        let name = self.parse_name().unwrap_or_else(|| self.missing_name("input object"));
+        let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
         let fields = self.parse_input_fields_definition_if_present();
         if directives.is_empty() && fields.is_empty() {
@@ -1420,19 +1418,16 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn missing_name(&self, context: &str) -> Name<'a> {
-        Name { value: "", span: Span::new(self.last_end, self.last_end) }.with_context(context)
+    fn missing_name(&self) -> Name<'a> {
+        Name { value: "", span: Span::new(self.last_end, self.last_end) }
     }
 
     fn missing_named_type(&self) -> NamedType<'a> {
-        NamedType { name: self.missing_name("type") }
+        NamedType { name: self.missing_name() }
     }
 
     fn missing_variable(&self) -> Variable<'a> {
-        Variable {
-            name: self.missing_name("variable"),
-            span: Span::new(self.last_end, self.last_end),
-        }
+        Variable { name: self.missing_name(), span: Span::new(self.last_end, self.last_end) }
     }
 
     fn limit_err<S: Into<String>>(&mut self, message: S) {
@@ -1565,16 +1560,6 @@ fn token_span(token: &Token<'_>) -> Span {
     let start = span_index(token.index());
     let end = span_index(token.index() + token.data().len());
     Span::new(start, end)
-}
-
-trait MissingNameContext {
-    fn with_context(self, context: &str) -> Self;
-}
-
-impl MissingNameContext for Name<'_> {
-    fn with_context(self, _context: &str) -> Self {
-        self
-    }
 }
 
 fn unescape_string(input: &str) -> String {
