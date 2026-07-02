@@ -22,7 +22,7 @@ impl Span {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Ast<'a, T> {
     source: &'a str,
     root: T,
@@ -104,31 +104,31 @@ impl<'a> Ast<'a, Type<'a>> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Document<'a> {
     pub definitions: AstVec<'a, Definition<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum Definition<'a> {
-    Operation(OperationDefinition<'a>),
-    Fragment(FragmentDefinition<'a>),
-    Directive(DirectiveDefinition<'a>),
-    Schema(SchemaDefinition<'a>),
-    SchemaExtension(SchemaExtension<'a>),
-    ScalarType(ScalarTypeDefinition<'a>),
-    ScalarTypeExtension(ScalarTypeExtension<'a>),
-    ObjectType(ObjectTypeDefinition<'a>),
-    ObjectTypeExtension(ObjectTypeExtension<'a>),
-    InterfaceType(InterfaceTypeDefinition<'a>),
-    InterfaceTypeExtension(InterfaceTypeExtension<'a>),
-    UnionType(UnionTypeDefinition<'a>),
-    UnionTypeExtension(UnionTypeExtension<'a>),
-    EnumType(EnumTypeDefinition<'a>),
-    EnumTypeExtension(EnumTypeExtension<'a>),
-    InputObjectType(InputObjectTypeDefinition<'a>),
-    InputObjectTypeExtension(InputObjectTypeExtension<'a>),
+    Operation(AstBox<'a, OperationDefinition<'a>>),
+    Fragment(AstBox<'a, FragmentDefinition<'a>>),
+    Directive(AstBox<'a, DirectiveDefinition<'a>>),
+    Schema(AstBox<'a, SchemaDefinition<'a>>),
+    SchemaExtension(AstBox<'a, SchemaExtension<'a>>),
+    ScalarType(AstBox<'a, ScalarTypeDefinition<'a>>),
+    ScalarTypeExtension(AstBox<'a, ScalarTypeExtension<'a>>),
+    ObjectType(AstBox<'a, ObjectTypeDefinition<'a>>),
+    ObjectTypeExtension(AstBox<'a, ObjectTypeExtension<'a>>),
+    InterfaceType(AstBox<'a, InterfaceTypeDefinition<'a>>),
+    InterfaceTypeExtension(AstBox<'a, InterfaceTypeExtension<'a>>),
+    UnionType(AstBox<'a, UnionTypeDefinition<'a>>),
+    UnionTypeExtension(AstBox<'a, UnionTypeExtension<'a>>),
+    EnumType(AstBox<'a, EnumTypeDefinition<'a>>),
+    EnumTypeExtension(AstBox<'a, EnumTypeExtension<'a>>),
+    InputObjectType(AstBox<'a, InputObjectTypeDefinition<'a>>),
+    InputObjectTypeExtension(AstBox<'a, InputObjectTypeExtension<'a>>),
 }
 
 impl<'a> Definition<'a> {
@@ -212,39 +212,39 @@ pub enum OperationType {
     Subscription,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct OperationDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub operation_type: OperationType,
     pub name: Option<Name<'a>>,
     pub variable_definitions: AstVec<'a, VariableDefinition<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub selection_set: Option<&'a SelectionSet<'a>>,
+    pub selection_set: Option<AstBox<'a, SelectionSet<'a>>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct FragmentDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub variable_definitions: AstVec<'a, VariableDefinition<'a>>,
     pub type_condition: NamedType<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub selection_set: Option<&'a SelectionSet<'a>>,
+    pub selection_set: Option<AstBox<'a, SelectionSet<'a>>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct SelectionSet<'a> {
     pub selections: AstVec<'a, Selection<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum Selection<'a> {
-    Field(Field<'a>),
-    FragmentSpread(FragmentSpread<'a>),
-    InlineFragment(InlineFragment<'a>),
+    Field(AstBox<'a, Field<'a>>),
+    FragmentSpread(AstBox<'a, FragmentSpread<'a>>),
+    InlineFragment(AstBox<'a, InlineFragment<'a>>),
 }
 
 impl Selection<'_> {
@@ -260,34 +260,34 @@ impl Selection<'_> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Field<'a> {
     pub alias: Option<Name<'a>>,
     pub name: Name<'a>,
     pub arguments: AstVec<'a, Argument<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub selection_set: Option<&'a SelectionSet<'a>>,
+    pub selection_set: Option<AstBox<'a, SelectionSet<'a>>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct FragmentSpread<'a> {
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct InlineFragment<'a> {
     pub type_condition: Option<NamedType<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub selection_set: Option<&'a SelectionSet<'a>>,
+    pub selection_set: Option<AstBox<'a, SelectionSet<'a>>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct VariableDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub variable: Variable<'a>,
     pub ty: Option<Type<'a>>,
     pub default_value: Option<Value<'a>>,
@@ -301,31 +301,31 @@ pub struct Variable<'a> {
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Argument<'a> {
     pub name: Name<'a>,
     pub value: Option<Value<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Directive<'a> {
     pub name: Name<'a>,
     pub arguments: AstVec<'a, Argument<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum Value<'a> {
-    Variable(Variable<'a>),
-    Int(IntValue<'a>),
-    Float(FloatValue<'a>),
-    String(StringValue<'a>),
-    Boolean(BooleanValue),
-    Null(NullValue),
-    Enum(EnumValue<'a>),
-    List(ListValue<'a>),
-    Object(ObjectValue<'a>),
+    Variable(AstBox<'a, Variable<'a>>),
+    Int(AstBox<'a, IntValue<'a>>),
+    Float(AstBox<'a, FloatValue<'a>>),
+    String(AstBox<'a, StringValue<'a>>),
+    Boolean(AstBox<'a, BooleanValue>),
+    Null(AstBox<'a, NullValue>),
+    Enum(AstBox<'a, EnumValue<'a>>),
+    List(AstBox<'a, ListValue<'a>>),
+    Object(AstBox<'a, ObjectValue<'a>>),
     Missing(Span),
 }
 
@@ -374,30 +374,30 @@ pub struct EnumValue<'a> {
     pub name: Name<'a>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct ListValue<'a> {
     pub values: AstVec<'a, Value<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct ObjectValue<'a> {
     pub fields: AstVec<'a, ObjectField<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct ObjectField<'a> {
     pub name: Name<'a>,
     pub value: Option<Value<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum Type<'a> {
-    Named(NamedType<'a>),
-    List(ListType<'a>),
-    NonNull(NonNullType<'a>),
+    Named(AstBox<'a, NamedType<'a>>),
+    List(AstBox<'a, ListType<'a>>),
+    NonNull(AstBox<'a, NonNullType<'a>>),
     Missing(Span),
 }
 
@@ -419,37 +419,25 @@ pub struct NamedType<'a> {
 
 #[derive(Debug)]
 pub struct ListType<'a> {
-    pub ty: AstBox<'a, Type<'a>>,
+    pub ty: Type<'a>,
     pub span: Span,
-}
-
-impl PartialEq for ListType<'_> {
-    fn eq(&self, other: &Self) -> bool {
-        self.ty.as_ref() == other.ty.as_ref() && self.span == other.span
-    }
 }
 
 #[derive(Debug)]
 pub struct NonNullType<'a> {
-    pub ty: AstBox<'a, Type<'a>>,
+    pub ty: Type<'a>,
     pub span: Span,
 }
 
-impl PartialEq for NonNullType<'_> {
-    fn eq(&self, other: &Self) -> bool {
-        self.ty.as_ref() == other.ty.as_ref() && self.span == other.span
-    }
-}
-
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct SchemaDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub root_operations: AstVec<'a, RootOperationTypeDefinition<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct SchemaExtension<'a> {
     pub directives: AstVec<'a, Directive<'a>>,
     pub root_operations: AstVec<'a, RootOperationTypeDefinition<'a>>,
@@ -463,9 +451,9 @@ pub struct RootOperationTypeDefinition<'a> {
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct DirectiveDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub arguments: AstVec<'a, InputValueDefinition<'a>>,
     pub repeatable: bool,
@@ -479,24 +467,24 @@ pub struct DirectiveLocation<'a> {
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct ScalarTypeDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct ScalarTypeExtension<'a> {
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct ObjectTypeDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub interfaces: AstVec<'a, NamedType<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
@@ -504,7 +492,7 @@ pub struct ObjectTypeDefinition<'a> {
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct ObjectTypeExtension<'a> {
     pub name: Name<'a>,
     pub interfaces: AstVec<'a, NamedType<'a>>,
@@ -513,9 +501,9 @@ pub struct ObjectTypeExtension<'a> {
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct InterfaceTypeDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub interfaces: AstVec<'a, NamedType<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
@@ -523,7 +511,7 @@ pub struct InterfaceTypeDefinition<'a> {
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct InterfaceTypeExtension<'a> {
     pub name: Name<'a>,
     pub interfaces: AstVec<'a, NamedType<'a>>,
@@ -532,16 +520,16 @@ pub struct InterfaceTypeExtension<'a> {
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct UnionTypeDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub members: AstVec<'a, NamedType<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct UnionTypeExtension<'a> {
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
@@ -549,16 +537,16 @@ pub struct UnionTypeExtension<'a> {
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct EnumTypeDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub values: AstVec<'a, EnumValueDefinition<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct EnumTypeExtension<'a> {
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
@@ -566,24 +554,24 @@ pub struct EnumTypeExtension<'a> {
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct EnumValueDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub value: EnumValue<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct InputObjectTypeDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub fields: AstVec<'a, InputValueDefinition<'a>>,
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct InputObjectTypeExtension<'a> {
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
@@ -591,9 +579,9 @@ pub struct InputObjectTypeExtension<'a> {
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct FieldDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub arguments: AstVec<'a, InputValueDefinition<'a>>,
     pub ty: Option<Type<'a>>,
@@ -601,12 +589,47 @@ pub struct FieldDefinition<'a> {
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct InputValueDefinition<'a> {
-    pub description: Option<&'a StringValue<'a>>,
+    pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub ty: Option<Type<'a>>,
     pub default_value: Option<Value<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub span: Span,
 }
+
+/// Compile-time size gates for the memory-sensitive AST nodes, in the style
+/// of `oxc_ast`'s `assert_layouts.rs`.
+///
+/// AST nodes are bulk data: parsers allocate thousands of them per document,
+/// so a size regression here is a memory and cache regression everywhere.
+/// If an intentional layout change trips these, update the constants.
+#[cfg(target_pointer_width = "64")]
+const _: () = {
+    use std::mem::size_of;
+
+    assert!(size_of::<Span>() == 8);
+    assert!(size_of::<Name>() == 24);
+    assert!(size_of::<StringValue>() == 48);
+
+    assert!(size_of::<Definition>() == 16);
+    assert!(size_of::<OperationDefinition>() == 104);
+    assert!(size_of::<FragmentDefinition>() == 120);
+
+    assert!(size_of::<SelectionSet>() == 32);
+    assert!(size_of::<Selection>() == 16);
+    assert!(size_of::<Field>() == 112);
+    assert!(size_of::<InlineFragment>() == 64);
+
+    assert!(size_of::<Value>() == 16);
+    assert!(size_of::<Argument>() == 48);
+    assert!(size_of::<ObjectField>() == 48);
+    assert!(size_of::<Directive>() == 56);
+    assert!(size_of::<Type>() == 16);
+
+    assert!(size_of::<FieldDefinition>() == 104);
+    assert!(size_of::<InputValueDefinition>() == 96);
+    assert!(size_of::<VariableDefinition>() == 104);
+    assert!(size_of::<EnumValueDefinition>() == 64);
+};
