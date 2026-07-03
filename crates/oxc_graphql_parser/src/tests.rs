@@ -1,4 +1,5 @@
 use crate::Allocator;
+use crate::Error;
 use crate::Lexer;
 use crate::Parser;
 use crate::TokenKind;
@@ -119,6 +120,33 @@ query Q {
     assert_eq!(spread.name.as_str(), "variableProfilePic");
     assert_eq!(spread.arguments.len(), 1);
     assert_eq!(spread.arguments[0].name.as_str(), "size");
+}
+
+#[test]
+fn parser_object_value_respects_recursion_limit() {
+    // Deeply-nested object values must trip the recursion limit and report an
+    // error instead of overflowing the stack — matching the guard already
+    // applied to list values and selection sets.
+    let depth = 100;
+    let mut source = String::from("query { field(arg: ");
+    source.push_str(&"{ nested: ".repeat(depth));
+    source.push('1');
+    source.push_str(&" }".repeat(depth));
+    source.push_str(") }");
+
+    let allocator = Allocator::default();
+    let ast = Parser::new(&allocator, &source).recursion_limit(16).parse();
+
+    assert!(
+        ast.errors().any(Error::is_limit),
+        "expected a recursion limit error for deeply nested object values"
+    );
+    assert!(ast.recursion_limit().high > ast.recursion_limit().limit);
+
+    // Nesting within the limit must still parse without a recursion error.
+    let ok = "query { field(arg: { a: { b: { c: 1 } } }) }";
+    let ok_ast = Parser::new(&allocator, ok).recursion_limit(16).parse();
+    assert!(!ok_ast.errors().any(Error::is_limit));
 }
 
 #[test]

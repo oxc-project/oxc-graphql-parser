@@ -311,34 +311,12 @@ impl<'a> Parser<'a> {
             };
         }
 
-        let operation_type = match self.peek_data() {
-            Some("query") => {
-                self.bump();
-                OperationType::Query
-            }
-            Some("mutation") => {
-                self.bump();
-                OperationType::Mutation
-            }
-            Some("subscription") => {
-                self.bump();
-                OperationType::Subscription
-            }
-            _ => {
-                self.err("expected Operation Type");
-                OperationType::Query
-            }
-        };
+        let operation_type = self.parse_operation_type("expected Operation Type");
 
         let name = if self.peek() == Some(TokenKind::Name) { self.parse_name() } else { None };
         let variable_definitions = self.parse_variable_definitions_if_present();
         let directives = self.parse_directives(Constness::NotConst);
-        let selection_set = if self.peek() == Some(T!['{']) {
-            Some(self.parse_alloc_selection_set())
-        } else {
-            self.err("expected a Selection Set");
-            None
-        };
+        let selection_set = self.parse_required_selection_set();
 
         OperationDefinition {
             description,
@@ -369,12 +347,7 @@ impl<'a> Parser<'a> {
         self.expect_name_value("on");
         let type_condition = self.parse_named_type().unwrap_or_else(|| self.missing_named_type());
         let directives = self.parse_directives(Constness::NotConst);
-        let selection_set = if self.peek() == Some(T!['{']) {
-            Some(self.parse_alloc_selection_set())
-        } else {
-            self.err("expected a Selection Set");
-            None
-        };
+        let selection_set = self.parse_required_selection_set();
 
         FragmentDefinition {
             description,
@@ -390,6 +363,41 @@ impl<'a> Parser<'a> {
     fn parse_alloc_selection_set(&mut self) -> ArenaBox<'a, SelectionSet<'a>> {
         let selection_set = self.parse_selection_set_inner();
         self.alloc(selection_set)
+    }
+
+    /// Parse a selection set that is required in this position. If the next
+    /// token is not `{`, records an error and returns `None`.
+    fn parse_required_selection_set(&mut self) -> Option<ArenaBox<'a, SelectionSet<'a>>> {
+        if self.peek() == Some(T!['{']) {
+            Some(self.parse_alloc_selection_set())
+        } else {
+            self.err("expected a Selection Set");
+            None
+        }
+    }
+
+    /// Parse an operation type keyword (`query`, `mutation`, or `subscription`),
+    /// consuming it. If none is present, records an error using `missing` and
+    /// falls back to `OperationType::Query`.
+    fn parse_operation_type(&mut self, missing: &str) -> OperationType {
+        match self.peek_data() {
+            Some("query") => {
+                self.bump();
+                OperationType::Query
+            }
+            Some("mutation") => {
+                self.bump();
+                OperationType::Mutation
+            }
+            Some("subscription") => {
+                self.bump();
+                OperationType::Subscription
+            }
+            _ => {
+                self.err(missing);
+                OperationType::Query
+            }
+        }
     }
 
     fn parse_selection_set_inner(&mut self) -> SelectionSet<'a> {
@@ -447,12 +455,7 @@ impl<'a> Parser<'a> {
             self.bump();
             let type_condition = self.parse_named_type();
             let directives = self.parse_directives(Constness::NotConst);
-            let selection_set = if self.peek() == Some(T!['{']) {
-                Some(self.parse_alloc_selection_set())
-            } else {
-                self.err("expected a Selection Set");
-                None
-            };
+            let selection_set = self.parse_required_selection_set();
             return Selection::InlineFragment(self.alloc(InlineFragment {
                 type_condition,
                 directives,
@@ -463,12 +466,7 @@ impl<'a> Parser<'a> {
 
         if matches!(self.peek(), Some(T![@] | T!['{'])) {
             let directives = self.parse_directives(Constness::NotConst);
-            let selection_set = if self.peek() == Some(T!['{']) {
-                Some(self.parse_alloc_selection_set())
-            } else {
-                self.err("expected a Selection Set");
-                None
-            };
+            let selection_set = self.parse_required_selection_set();
             return Selection::InlineFragment(self.alloc(InlineFragment {
                 type_condition: None,
                 directives,
@@ -751,8 +749,13 @@ impl<'a> Parser<'a> {
                 parser.bump();
                 ControlFlow::Break(())
             }
+            TokenKind::Name if parser.recursion_limit.check_and_increment() => {
+                parser.limit_err("parser recursion limit reached");
+                ControlFlow::Break(())
+            }
             TokenKind::Name => {
                 fields.push(parser.parse_object_field(constness));
+                parser.recursion_limit.decrement();
                 ControlFlow::Continue(())
             }
             TokenKind::Eof => {
@@ -790,7 +793,8 @@ impl<'a> Parser<'a> {
                     self.limit_err("parser recursion limit reached");
                     return Some(Type::Missing(self.span_from(start)));
                 }
-                let inner = self.parse_type_inner().unwrap_or(Type::Missing(self.current_span()));
+                let inner =
+                    self.parse_type_inner().unwrap_or_else(|| Type::Missing(self.current_span()));
                 self.recursion_limit.decrement();
                 self.expect(T![']'], "expected ]");
                 Type::List(self.alloc(ListType { ty: inner, span: self.span_from(start) }))
@@ -872,24 +876,7 @@ impl<'a> Parser<'a> {
 
     fn parse_root_operation_type_definition(&mut self) -> RootOperationTypeDefinition<'a> {
         let start = self.current_start();
-        let operation_type = match self.peek_data() {
-            Some("query") => {
-                self.bump();
-                OperationType::Query
-            }
-            Some("mutation") => {
-                self.bump();
-                OperationType::Mutation
-            }
-            Some("subscription") => {
-                self.bump();
-                OperationType::Subscription
-            }
-            _ => {
-                self.err("expected an Operation Type");
-                OperationType::Query
-            }
-        };
+        let operation_type = self.parse_operation_type("expected an Operation Type");
         self.expect(T![:], "expected :");
         let named_type = self.parse_named_type().unwrap_or_else(|| self.missing_named_type());
         RootOperationTypeDefinition { operation_type, named_type, span: self.span_from(start) }

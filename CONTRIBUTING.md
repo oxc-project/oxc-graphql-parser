@@ -24,15 +24,6 @@ To run tests:
 cargo test --workspace
 ```
 
-To run parser and lexer tests _and_ let the testing framework make changes to the incorrect files on a unix system:
-```bash
-env UPDATE_EXPECT=1 cargo test --package oxc-graphql-parser
-```
-or the same in powershell:
-```bash
-$env:UPDATE_EXPECT=1; cargo test --package oxc-graphql-parser
-```
-
 To format your code:
 ```bash
 rustup install nightly
