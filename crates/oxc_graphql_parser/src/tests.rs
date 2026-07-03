@@ -300,6 +300,32 @@ extend type T {
 }
 
 #[test]
+fn parser_parses_experimental_directives_on_directive_definitions() {
+    let source = "directive @foo @bar @baz on FIELD";
+    let allocator = Allocator::default();
+    let ast = Parser::new(&allocator, source)
+        .experimental_directives_on_directive_definitions(true)
+        .parse();
+    assert_eq!(ast.errors().len(), 0);
+
+    let ast::Definition::Directive(directive) = &ast.document().definitions[0] else {
+        panic!("expected directive definition");
+    };
+    assert_eq!(directive.name.as_str(), "foo");
+    assert_eq!(directive.directives.len(), 2);
+    assert_eq!(directive.directives[0].name.as_str(), "bar");
+    assert_eq!(directive.directives[1].name.as_str(), "baz");
+}
+
+#[test]
+fn parser_rejects_directives_on_directive_definitions_without_flag() {
+    let source = "directive @foo @bar on FIELD";
+    let allocator = Allocator::default();
+    let ast = Parser::new(&allocator, source).parse();
+    assert!(ast.errors().len() > 0);
+}
+
+#[test]
 fn parser_ok_fixtures_have_no_errors() {
     for path in graphql_files("parser/ok") {
         let source = fs::read_to_string(&path).unwrap();
