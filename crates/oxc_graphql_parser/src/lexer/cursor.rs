@@ -25,9 +25,9 @@ impl<'a> Cursor<'a> {
 
     /// Consumes the remaining bytes of a name token and returns its full text.
     ///
-    /// The first name byte is already consumed by `bump` in `State::Start`; this
+    /// The first name byte is already consumed by `bump` in `advance`; this
     /// scans the rest of the name in a tight loop over the raw bytes, avoiding
-    /// the per-byte state-machine dispatch of the main lexer loop. It leaves the
+    /// re-dispatching each byte through `advance`. It leaves the
     /// cursor in the exact position the per-byte path would: stopped before the
     /// terminator (mirroring `prev_str`), or at end of input with the
     /// EOF-adjacent index preserved for token-limit diagnostics (mirroring
@@ -116,8 +116,8 @@ impl<'a> Cursor<'a> {
     /// Consumes the remaining bytes of a comment (the `#` is already consumed)
     /// and returns the end of its text.
     ///
-    /// Scans to the next line terminator with `memchr` instead of the per-byte
-    /// main lexer loop. Leaves the cursor exactly where the per-byte path
+    /// Scans to the next line terminator with `memchr` instead of re-dispatching
+    /// each byte through `advance`. Leaves the cursor exactly where the per-byte path
     /// would: stopped before the terminator (mirroring `prev_str`), or at end
     /// of input with the EOF-adjacent index preserved for token-limit
     /// diagnostics (mirroring `current_str`).
@@ -142,10 +142,10 @@ impl<'a> Cursor<'a> {
 
     /// Consumes the remaining bytes of a whitespace run and returns its text.
     ///
-    /// The first whitespace unit is already consumed in `State::Start`; this
+    /// The first whitespace unit is already consumed by `bump` in `advance`; this
     /// scans the rest of the run in a tight loop over the raw bytes (assimilated
-    /// whitespace plus byte-order marks), avoiding the per-byte state-machine
-    /// dispatch of the main lexer loop. It leaves the cursor exactly where the
+    /// whitespace plus byte-order marks), avoiding re-dispatching each byte
+    /// through `advance`. It leaves the cursor exactly where the
     /// per-byte path would: stopped before the terminator (mirroring `prev_str`),
     /// or at end of input with the EOF-adjacent index preserved for token-limit
     /// diagnostics (mirroring `current_str`).
