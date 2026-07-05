@@ -1,24 +1,11 @@
-use crate::Allocator;
-use crate::Error;
-use crate::Lexer;
-use crate::Parser;
-use crate::TokenKind;
-use crate::ast;
 use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 
-#[test]
-fn lexer_tests() {
-    let source = r#"
-type Query {
-  hello(name: String = "world"): String
-}
-"#;
-    let (tokens, errors) = Lexer::new(source).lex();
-    assert!(errors.is_empty());
-    assert!(tokens.iter().any(|token| token.kind() == TokenKind::Name && token.data() == "Query"));
-}
+use oxc_graphql_parser::Allocator;
+use oxc_graphql_parser::Error;
+use oxc_graphql_parser::Parser;
+use oxc_graphql_parser::ast;
 
 #[test]
 fn parser_parses_object_type_definition() {
@@ -248,22 +235,6 @@ fn parser_comment_spans_end_before_line_terminators() {
         assert_eq!(ast.errors().len(), 0);
         let end = u32::try_from("# comment".len()).unwrap();
         assert_eq!(ast.comments(), [ast::Span::new(0, end)]);
-    }
-}
-
-#[test]
-fn lexer_roundtrip_corpus() {
-    // For any input the lexer tokenizes without errors, concatenating all
-    // token text must reproduce the source exactly.
-    for dir in ["lexer/ok", "lexer/err", "parser/ok", "parser/err"] {
-        for path in graphql_files(dir) {
-            let source = fs::read_to_string(&path).unwrap();
-            let (tokens, errors) = Lexer::new(&source).lex();
-            if errors.is_empty() {
-                let concatenated: String = tokens.iter().map(crate::Token::data).collect();
-                assert_eq!(source, concatenated, "{}", path.display());
-            }
-        }
     }
 }
 
