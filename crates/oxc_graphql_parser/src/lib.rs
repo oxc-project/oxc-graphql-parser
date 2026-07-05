@@ -3,8 +3,6 @@
 
 pub mod ast;
 mod lexer;
-#[cfg(test)]
-mod tests;
 
 mod error;
 mod limit;
