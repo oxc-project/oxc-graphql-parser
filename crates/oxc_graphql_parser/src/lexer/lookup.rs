@@ -2,7 +2,7 @@
 ///
 /// One 256-entry table lookup replaces the chain of per-character checks the
 /// lexer would otherwise run for every token start.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy)]
 #[repr(u8)]
 pub(crate) enum ByteClass {
     Other,

@@ -28,7 +28,7 @@ pub use token_kind::TokenKind;
 /// let (tokens, errors) = Lexer::new(query).lex();
 /// assert_eq!(errors.len(), 0);
 /// ```
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Lexer<'a> {
     finished: bool,
     cursor: Cursor<'a>,
@@ -36,7 +36,6 @@ pub struct Lexer<'a> {
 }
 
 /// States of the number token state machine.
-#[derive(Debug, Clone, Copy)]
 enum NumberState {
     MinusSign,
     LeadingZero,
