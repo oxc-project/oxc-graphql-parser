@@ -109,14 +109,6 @@ impl<'a> Parser<'a> {
         Ast::new(self.input, root, self.errors, self.comments, self.recursion_limit, token_limit)
     }
 
-    fn new_vec<T>(&self) -> ArenaVec<'a, T> {
-        ArenaVec::new_in(&self.allocator)
-    }
-
-    fn alloc<T>(&self, value: T) -> ArenaBox<'a, T> {
-        ArenaBox::new_in(value, &self.allocator)
-    }
-
     /// Marks the start of a new scratch-built list, pre-sizing the stack so
     /// small parses pay for at most one scratch allocation.
     fn scratch_mark(&mut self) -> usize {
@@ -177,11 +169,11 @@ impl<'a> Parser<'a> {
         let definition = match selector {
             "directive" => {
                 let definition = self.parse_directive_definition(description);
-                Definition::Directive(self.alloc(definition))
+                Definition::Directive(ArenaBox::new_in(definition, &self.allocator))
             }
             "enum" => {
                 let definition = self.parse_enum_type_definition(description);
-                Definition::EnumType(self.alloc(definition))
+                Definition::EnumType(ArenaBox::new_in(definition, &self.allocator))
             }
             "extend" => {
                 if description.is_some() {
@@ -193,19 +185,19 @@ impl<'a> Parser<'a> {
             }
             "fragment" => {
                 let definition = self.parse_fragment_definition(description);
-                Definition::Fragment(self.alloc(definition))
+                Definition::Fragment(ArenaBox::new_in(definition, &self.allocator))
             }
             "input" => {
                 let definition = self.parse_input_object_type_definition(description);
-                Definition::InputObjectType(self.alloc(definition))
+                Definition::InputObjectType(ArenaBox::new_in(definition, &self.allocator))
             }
             "interface" => {
                 let definition = self.parse_interface_type_definition(description);
-                Definition::InterfaceType(self.alloc(definition))
+                Definition::InterfaceType(ArenaBox::new_in(definition, &self.allocator))
             }
             "type" => {
                 let definition = self.parse_object_type_definition(description);
-                Definition::ObjectType(self.alloc(definition))
+                Definition::ObjectType(ArenaBox::new_in(definition, &self.allocator))
             }
             "{" => {
                 if description.is_some() {
@@ -214,23 +206,23 @@ impl<'a> Parser<'a> {
                     );
                 }
                 let definition = self.parse_operation_definition(description);
-                Definition::Operation(self.alloc(definition))
+                Definition::Operation(ArenaBox::new_in(definition, &self.allocator))
             }
             "query" | "mutation" | "subscription" => {
                 let definition = self.parse_operation_definition(description);
-                Definition::Operation(self.alloc(definition))
+                Definition::Operation(ArenaBox::new_in(definition, &self.allocator))
             }
             "scalar" => {
                 let definition = self.parse_scalar_type_definition(description);
-                Definition::ScalarType(self.alloc(definition))
+                Definition::ScalarType(ArenaBox::new_in(definition, &self.allocator))
             }
             "schema" => {
                 let definition = self.parse_schema_definition(description);
-                Definition::Schema(self.alloc(definition))
+                Definition::Schema(ArenaBox::new_in(definition, &self.allocator))
             }
             "union" => {
                 let definition = self.parse_union_type_definition(description);
-                Definition::UnionType(self.alloc(definition))
+                Definition::UnionType(ArenaBox::new_in(definition, &self.allocator))
             }
             _ => {
                 if description.is_some() {
@@ -252,35 +244,35 @@ impl<'a> Parser<'a> {
         let definition = match self.peek_data() {
             Some("schema") => {
                 let extension = self.parse_schema_extension_from(start);
-                Definition::SchemaExtension(self.alloc(extension))
+                Definition::SchemaExtension(ArenaBox::new_in(extension, &self.allocator))
             }
             Some("scalar") => {
                 let extension = self.parse_scalar_type_extension_from(start);
-                Definition::ScalarTypeExtension(self.alloc(extension))
+                Definition::ScalarTypeExtension(ArenaBox::new_in(extension, &self.allocator))
             }
             Some("type") => {
                 let extension = self.parse_object_type_extension_from(start);
-                Definition::ObjectTypeExtension(self.alloc(extension))
+                Definition::ObjectTypeExtension(ArenaBox::new_in(extension, &self.allocator))
             }
             Some("interface") => {
                 let extension = self.parse_interface_type_extension_from(start);
-                Definition::InterfaceTypeExtension(self.alloc(extension))
+                Definition::InterfaceTypeExtension(ArenaBox::new_in(extension, &self.allocator))
             }
             Some("union") => {
                 let extension = self.parse_union_type_extension_from(start);
-                Definition::UnionTypeExtension(self.alloc(extension))
+                Definition::UnionTypeExtension(ArenaBox::new_in(extension, &self.allocator))
             }
             Some("enum") => {
                 let extension = self.parse_enum_type_extension_from(start);
-                Definition::EnumTypeExtension(self.alloc(extension))
+                Definition::EnumTypeExtension(ArenaBox::new_in(extension, &self.allocator))
             }
             Some("input") => {
                 let extension = self.parse_input_object_type_extension_from(start);
-                Definition::InputObjectTypeExtension(self.alloc(extension))
+                Definition::InputObjectTypeExtension(ArenaBox::new_in(extension, &self.allocator))
             }
             Some("directive") => {
                 let extension = self.parse_directive_extension_from(start);
-                Definition::DirectiveExtension(self.alloc(extension))
+                Definition::DirectiveExtension(ArenaBox::new_in(extension, &self.allocator))
             }
             _ => {
                 self.err("expected a valid extension");
@@ -304,8 +296,8 @@ impl<'a> Parser<'a> {
                 description,
                 operation_type: OperationType::Query,
                 name: None,
-                variable_definitions: self.new_vec(),
-                directives: self.new_vec(),
+                variable_definitions: ArenaVec::new_in(&self.allocator),
+                directives: ArenaVec::new_in(&self.allocator),
                 selection_set,
                 span: self.span_from(start),
             };
@@ -341,7 +333,7 @@ impl<'a> Parser<'a> {
         let variable_definitions = if self.experimental_fragment_arguments {
             self.parse_variable_definitions_if_present()
         } else {
-            self.new_vec()
+            ArenaVec::new_in(&self.allocator)
         };
 
         self.expect_name_value("on");
@@ -362,7 +354,7 @@ impl<'a> Parser<'a> {
 
     fn parse_alloc_selection_set(&mut self) -> ArenaBox<'a, SelectionSet<'a>> {
         let selection_set = self.parse_selection_set_inner();
-        self.alloc(selection_set)
+        ArenaBox::new_in(selection_set, &self.allocator)
     }
 
     /// Parse a selection set that is required in this position. If the next
@@ -443,7 +435,7 @@ impl<'a> Parser<'a> {
             self.parse_fragment_selection()
         } else {
             let field = self.parse_field();
-            Selection::Field(self.alloc(field))
+            Selection::Field(ArenaBox::new_in(field, &self.allocator))
         }
     }
 
@@ -456,38 +448,42 @@ impl<'a> Parser<'a> {
             let type_condition = self.parse_named_type();
             let directives = self.parse_directives(Constness::NotConst);
             let selection_set = self.parse_required_selection_set();
-            return Selection::InlineFragment(self.alloc(InlineFragment {
-                type_condition,
-                directives,
-                selection_set,
-                span: self.span_from(start),
-            }));
+            return Selection::InlineFragment(ArenaBox::new_in(
+                InlineFragment {
+                    type_condition,
+                    directives,
+                    selection_set,
+                    span: self.span_from(start),
+                },
+                &self.allocator,
+            ));
         }
 
         if matches!(self.peek(), Some(T![@] | T!['{'])) {
             let directives = self.parse_directives(Constness::NotConst);
             let selection_set = self.parse_required_selection_set();
-            return Selection::InlineFragment(self.alloc(InlineFragment {
-                type_condition: None,
-                directives,
-                selection_set,
-                span: self.span_from(start),
-            }));
+            return Selection::InlineFragment(ArenaBox::new_in(
+                InlineFragment {
+                    type_condition: None,
+                    directives,
+                    selection_set,
+                    span: self.span_from(start),
+                },
+                &self.allocator,
+            ));
         }
 
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let arguments = if self.experimental_fragment_arguments {
             self.parse_arguments_if_present(Constness::NotConst)
         } else {
-            self.new_vec()
+            ArenaVec::new_in(&self.allocator)
         };
         let directives = self.parse_directives(Constness::NotConst);
-        Selection::FragmentSpread(self.alloc(FragmentSpread {
-            name,
-            arguments,
-            directives,
-            span: self.span_from(start),
-        }))
+        Selection::FragmentSpread(ArenaBox::new_in(
+            FragmentSpread { name, arguments, directives, span: self.span_from(start) },
+            &self.allocator,
+        ))
     }
 
     fn parse_field(&mut self) -> Field<'a> {
@@ -514,7 +510,7 @@ impl<'a> Parser<'a> {
 
     fn parse_arguments_if_present(&mut self, constness: Constness) -> ArenaVec<'a, Argument<'a>> {
         if self.peek() != Some(T!['(']) {
-            return self.new_vec();
+            return ArenaVec::new_in(&self.allocator);
         }
 
         self.bump();
@@ -559,7 +555,7 @@ impl<'a> Parser<'a> {
 
     fn parse_variable_definitions_if_present(&mut self) -> ArenaVec<'a, VariableDefinition<'a>> {
         if self.peek() != Some(T!['(']) {
-            return self.new_vec();
+            return ArenaVec::new_in(&self.allocator);
         }
 
         self.bump();
@@ -598,7 +594,7 @@ impl<'a> Parser<'a> {
         let variable = self.parse_variable().unwrap_or_else(|| self.missing_variable());
         let mut ty = None;
         let mut default_value = None;
-        let mut directives = self.new_vec();
+        let mut directives = ArenaVec::new_in(&self.allocator);
 
         if self.peek() == Some(T![:]) {
             self.bump();
@@ -635,7 +631,7 @@ impl<'a> Parser<'a> {
 
     fn parse_directives(&mut self, constness: Constness) -> ArenaVec<'a, Directive<'a>> {
         if self.peek() != Some(T![@]) {
-            return self.new_vec();
+            return ArenaVec::new_in(&self.allocator);
         }
 
         let mark = self.scratch_mark();
@@ -664,14 +660,14 @@ impl<'a> Parser<'a> {
                     self.err("unexpected variable value in a Const context");
                 }
                 match self.parse_variable() {
-                    Some(variable) => Value::Variable(self.alloc(variable)),
+                    Some(variable) => Value::Variable(ArenaBox::new_in(variable, &self.allocator)),
                     None => Value::Missing(self.current_span()),
                 }
             }
             Some(TokenKind::Int) => self.parse_int_value(),
             Some(TokenKind::Float) => self.parse_float_value(),
             Some(TokenKind::StringValue) => match self.parse_string_value() {
-                Some(value) => Value::String(self.alloc(value)),
+                Some(value) => Value::String(ArenaBox::new_in(value, &self.allocator)),
                 None => Value::Missing(self.current_span()),
             },
             Some(TokenKind::Name) => self.parse_name_value(),
@@ -691,12 +687,18 @@ impl<'a> Parser<'a> {
 
     fn parse_int_value(&mut self) -> Value<'a> {
         let token = self.bump().expect("peeked int token must be available");
-        Value::Int(self.alloc(IntValue { raw: token.data(), span: token_span(&token) }))
+        Value::Int(ArenaBox::new_in(
+            IntValue { raw: token.data(), span: token_span(&token) },
+            &self.allocator,
+        ))
     }
 
     fn parse_float_value(&mut self) -> Value<'a> {
         let token = self.bump().expect("peeked float token must be available");
-        Value::Float(self.alloc(FloatValue { raw: token.data(), span: token_span(&token) }))
+        Value::Float(ArenaBox::new_in(
+            FloatValue { raw: token.data(), span: token_span(&token) },
+            &self.allocator,
+        ))
     }
 
     fn parse_name_value(&mut self) -> Value<'a> {
@@ -704,17 +706,23 @@ impl<'a> Parser<'a> {
             return Value::Missing(self.current_span());
         };
         match name.value {
-            "true" => Value::Boolean(self.alloc(BooleanValue { value: true, span: name.span })),
-            "false" => Value::Boolean(self.alloc(BooleanValue { value: false, span: name.span })),
-            "null" => Value::Null(self.alloc(NullValue { span: name.span })),
-            _ => Value::Enum(self.alloc(EnumValue { name })),
+            "true" => Value::Boolean(ArenaBox::new_in(
+                BooleanValue { value: true, span: name.span },
+                &self.allocator,
+            )),
+            "false" => Value::Boolean(ArenaBox::new_in(
+                BooleanValue { value: false, span: name.span },
+                &self.allocator,
+            )),
+            "null" => Value::Null(ArenaBox::new_in(NullValue { span: name.span }, &self.allocator)),
+            _ => Value::Enum(ArenaBox::new_in(EnumValue { name }, &self.allocator)),
         }
     }
 
     fn parse_list_value(&mut self, constness: Constness) -> Value<'a> {
         let start = self.current_start();
         self.expect(T!['['], "expected [");
-        let mut values = self.new_vec();
+        let mut values = ArenaVec::new_in(&self.allocator);
 
         self.peek_while(|parser, kind| match kind {
             T![']'] => {
@@ -736,13 +744,16 @@ impl<'a> Parser<'a> {
             }
         });
 
-        Value::List(self.alloc(ListValue { values, span: self.span_from(start) }))
+        Value::List(ArenaBox::new_in(
+            ListValue { values, span: self.span_from(start) },
+            &self.allocator,
+        ))
     }
 
     fn parse_object_value(&mut self, constness: Constness) -> Value<'a> {
         let start = self.current_start();
         self.expect(T!['{'], "expected {");
-        let mut fields = self.new_vec();
+        let mut fields = ArenaVec::new_in(&self.allocator);
 
         self.peek_while(|parser, kind| match kind {
             T!['}'] => {
@@ -768,7 +779,10 @@ impl<'a> Parser<'a> {
             }
         });
 
-        Value::Object(self.alloc(ObjectValue { fields, span: self.span_from(start) }))
+        Value::Object(ArenaBox::new_in(
+            ObjectValue { fields, span: self.span_from(start) },
+            &self.allocator,
+        ))
     }
 
     fn parse_object_field(&mut self, constness: Constness) -> ObjectField<'a> {
@@ -797,11 +811,14 @@ impl<'a> Parser<'a> {
                     self.parse_type_inner().unwrap_or_else(|| Type::Missing(self.current_span()));
                 self.recursion_limit.decrement();
                 self.expect(T![']'], "expected ]");
-                Type::List(self.alloc(ListType { ty: inner, span: self.span_from(start) }))
+                Type::List(ArenaBox::new_in(
+                    ListType { ty: inner, span: self.span_from(start) },
+                    &self.allocator,
+                ))
             }
             Some(TokenKind::Name) => {
                 let name = self.parse_name().unwrap_or_else(|| self.missing_name());
-                Type::Named(self.alloc(NamedType { name }))
+                Type::Named(ArenaBox::new_in(NamedType { name }, &self.allocator))
             }
             Some(_) => {
                 self.err("expected a type");
@@ -812,7 +829,10 @@ impl<'a> Parser<'a> {
 
         if self.peek() == Some(T![!]) {
             self.bump();
-            ty = Type::NonNull(self.alloc(NonNullType { ty, span: self.span_from(start) }));
+            ty = Type::NonNull(ArenaBox::new_in(
+                NonNullType { ty, span: self.span_from(start) },
+                &self.allocator,
+            ));
         }
 
         Some(ty)
@@ -848,11 +868,11 @@ impl<'a> Parser<'a> {
         &mut self,
     ) -> ArenaVec<'a, RootOperationTypeDefinition<'a>> {
         if self.peek() != Some(T!['{']) {
-            return self.new_vec();
+            return ArenaVec::new_in(&self.allocator);
         }
 
         self.bump();
-        let mut root_operations = self.new_vec();
+        let mut root_operations = ArenaVec::new_in(&self.allocator);
         self.peek_while(|parser, kind| match kind {
             T!['}'] => {
                 parser.bump();
@@ -929,7 +949,7 @@ impl<'a> Parser<'a> {
             self.bump();
         }
 
-        let mut locations = self.new_vec();
+        let mut locations = ArenaVec::new_in(&self.allocator);
         loop {
             if let Some(token) = self.peek_token().copied()
                 && token.kind() == TokenKind::Name
@@ -1040,7 +1060,7 @@ impl<'a> Parser<'a> {
 
     fn parse_implements_interfaces(&mut self) -> ArenaVec<'a, NamedType<'a>> {
         if self.peek_data() != Some("implements") {
-            return self.new_vec();
+            return ArenaVec::new_in(&self.allocator);
         }
 
         self.bump();
@@ -1048,7 +1068,7 @@ impl<'a> Parser<'a> {
             self.bump();
         }
 
-        let mut interfaces = self.new_vec();
+        let mut interfaces = ArenaVec::new_in(&self.allocator);
         loop {
             if let Some(named_type) = self.parse_named_type() {
                 interfaces.push(named_type);
@@ -1068,7 +1088,7 @@ impl<'a> Parser<'a> {
 
     fn parse_fields_definition_if_present(&mut self) -> ArenaVec<'a, FieldDefinition<'a>> {
         if self.peek() != Some(T!['{']) {
-            return self.new_vec();
+            return ArenaVec::new_in(&self.allocator);
         }
 
         self.bump();
@@ -1126,7 +1146,7 @@ impl<'a> Parser<'a> {
 
     fn parse_arguments_definition_if_present(&mut self) -> ArenaVec<'a, InputValueDefinition<'a>> {
         if self.peek() != Some(T!['(']) {
-            return self.new_vec();
+            return ArenaVec::new_in(&self.allocator);
         }
 
         self.bump();
@@ -1210,7 +1230,7 @@ impl<'a> Parser<'a> {
 
     fn parse_union_members_if_present(&mut self) -> ArenaVec<'a, NamedType<'a>> {
         if self.peek() != Some(T![=]) {
-            return self.new_vec();
+            return ArenaVec::new_in(&self.allocator);
         }
 
         self.bump();
@@ -1218,7 +1238,7 @@ impl<'a> Parser<'a> {
             self.bump();
         }
 
-        let mut members = self.new_vec();
+        let mut members = ArenaVec::new_in(&self.allocator);
         loop {
             if let Some(member) = self.parse_named_type() {
                 members.push(member);
@@ -1262,11 +1282,11 @@ impl<'a> Parser<'a> {
 
     fn parse_enum_values_definition_if_present(&mut self) -> ArenaVec<'a, EnumValueDefinition<'a>> {
         if self.peek() != Some(T!['{']) {
-            return self.new_vec();
+            return ArenaVec::new_in(&self.allocator);
         }
 
         self.bump();
-        let mut values = self.new_vec();
+        let mut values = ArenaVec::new_in(&self.allocator);
         self.peek_while(|parser, kind| match kind {
             T!['}'] => {
                 if values.is_empty() {
@@ -1339,7 +1359,7 @@ impl<'a> Parser<'a> {
         &mut self,
     ) -> ArenaVec<'a, InputValueDefinition<'a>> {
         if self.peek() != Some(T!['{']) {
-            return self.new_vec();
+            return ArenaVec::new_in(&self.allocator);
         }
 
         self.bump();
@@ -1375,7 +1395,7 @@ impl<'a> Parser<'a> {
     fn parse_description_if_present(&mut self) -> Option<ArenaBox<'a, StringValue<'a>>> {
         if self.peek() == Some(TokenKind::StringValue) {
             let value = self.parse_string_value()?;
-            Some(self.alloc(value))
+            Some(ArenaBox::new_in(value, &self.allocator))
         } else {
             None
         }
