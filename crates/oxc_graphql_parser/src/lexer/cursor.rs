@@ -1,7 +1,7 @@
 use crate::Error;
 
 /// Byte cursor over GraphQL source text.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub(crate) struct Cursor<'a> {
     pub(super) index: usize,
     pub(super) offset: usize,
