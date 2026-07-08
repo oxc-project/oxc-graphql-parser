@@ -1,5 +1,7 @@
 # oxc-graphql-parser
 
+This is a fork of [apollographql/apollo-rs](https://github.com/apollographql/apollo-rs) for Oxfmt; only the parser remains.
+
 Rust tooling for parsing GraphQL documents.
 
 This repository currently contains one crate:
