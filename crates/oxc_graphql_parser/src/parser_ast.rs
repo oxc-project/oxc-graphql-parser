@@ -1640,9 +1640,7 @@ fn normalize_block_string(raw: &str) -> String {
     let mut chars = content.chars().peekable();
     while let Some(ch) = chars.next() {
         if ch == '\r' {
-            if chars.peek() == Some(&'\n') {
-                chars.next();
-            }
+            chars.next_if_eq(&'\n');
             output.push('\n');
         } else {
             output.push(ch);
