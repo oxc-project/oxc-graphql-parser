@@ -287,8 +287,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> OperationDefinition<'a> {
-        let start =
-            description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
+        let start = self.definition_start(&description);
 
         if self.peek() == Some(T!['{']) {
             let selection_set = Some(self.parse_alloc_selection_set());
@@ -325,8 +324,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> FragmentDefinition<'a> {
-        let start =
-            description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
+        let start = self.definition_start(&description);
         self.expect_name_value("fragment");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
 
@@ -846,8 +844,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> SchemaDefinition<'a> {
-        let start =
-            description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
+        let start = self.definition_start(&description);
         self.expect_name_value("schema");
         let directives = self.parse_directives(Constness::Const);
         let root_operations = self.parse_root_operation_types_if_present();
@@ -917,8 +914,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> DirectiveDefinition<'a> {
-        let start =
-            description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
+        let start = self.definition_start(&description);
         self.expect_name_value("directive");
         self.expect(T![@], "expected @ symbol");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
@@ -974,8 +970,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> ScalarTypeDefinition<'a> {
-        let start =
-            description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
+        let start = self.definition_start(&description);
         self.expect_name_value("scalar");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
@@ -996,8 +991,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> ObjectTypeDefinition<'a> {
-        let start =
-            description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
+        let start = self.definition_start(&description);
         self.expect_name_value("type");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let interfaces = self.parse_implements_interfaces();
@@ -1029,8 +1023,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> InterfaceTypeDefinition<'a> {
-        let start =
-            description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
+        let start = self.definition_start(&description);
         self.expect_name_value("interface");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let interfaces = self.parse_implements_interfaces();
@@ -1208,8 +1201,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> UnionTypeDefinition<'a> {
-        let start =
-            description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
+        let start = self.definition_start(&description);
         self.expect_name_value("union");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
@@ -1260,8 +1252,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> EnumTypeDefinition<'a> {
-        let start =
-            description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
+        let start = self.definition_start(&description);
         self.expect_name_value("enum");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
@@ -1326,8 +1317,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> InputObjectTypeDefinition<'a> {
-        let start =
-            description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start);
+        let start = self.definition_start(&description);
         self.expect_name_value("input");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
@@ -1399,6 +1389,12 @@ impl<'a> Parser<'a> {
         } else {
             None
         }
+    }
+
+    /// The span start of a definition: the start of its already-parsed
+    /// description if it has one, otherwise the start of the current token.
+    fn definition_start(&mut self, description: &Option<ArenaBox<'a, StringValue<'a>>>) -> u32 {
+        description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start)
     }
 
     fn parse_string_value(&mut self) -> Option<StringValue<'a>> {
