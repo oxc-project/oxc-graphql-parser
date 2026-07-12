@@ -410,14 +410,18 @@ impl<'a> Parser<'a> {
                 parser.err("expected }");
                 ControlFlow::Break(())
             }
-            _ if parser.recursion_limit.check_and_increment() => {
+            TokenKind::Name | T![...] if parser.recursion_limit.check_and_increment() => {
                 parser.limit_err("parser recursion limit reached");
                 ControlFlow::Break(())
             }
-            _ => {
+            TokenKind::Name | T![...] => {
                 let selection = parser.parse_selection();
                 parser.scratch.push(ScratchNode::Selection(selection));
                 parser.recursion_limit.decrement();
+                ControlFlow::Continue(())
+            }
+            _ => {
+                parser.err_and_pop("expected a Selection");
                 ControlFlow::Continue(())
             }
         });
