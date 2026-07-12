@@ -184,7 +184,7 @@ fn parser_string_values() {
     // Escaped strings and block strings with `\r` line endings are unescaped
     // or normalized into arena-allocated values; strings that need no
     // rewriting are borrowed directly from the source text.
-    let source = "\"plain\"\nscalar A\n\"esc\\u0041ped \\n\\\"quote\\\" end\"\nscalar B\n\"\"\"one\r\ntwo\rthree\nfour\"\"\"\nscalar C\n\"\"\"block unchanged\"\"\"\nscalar D";
+    let source = "\"plain\"\nscalar A\n\"esc\\u0041ped \\n\\\"quote\\\" end\"\nscalar B\n\"\"\"one\r\ntwo\rthree\nfour\"\"\"\nscalar C\n\"\"\"block unchanged\"\"\"\nscalar D\n\"trailing \\\"\"\nscalar E\n\"\\\"\"\nscalar F";
     let allocator = Allocator::default();
     let ast = Parser::new(&allocator, source).parse();
     assert_eq!(ast.errors().len(), 0);
@@ -202,7 +202,14 @@ fn parser_string_values() {
         .collect::<Vec<_>>();
     assert_eq!(
         descriptions,
-        ["plain", "escAped \n\"quote\" end", "one\ntwo\nthree\nfour", "block unchanged"]
+        [
+            "plain",
+            "escAped \n\"quote\" end",
+            "one\ntwo\nthree\nfour",
+            "block unchanged",
+            "trailing \"",
+            "\"",
+        ]
     );
 }
 
