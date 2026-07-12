@@ -391,6 +391,42 @@ fn parser_err_fixtures_have_errors() {
 }
 
 #[test]
+fn selection_set_recovers_from_invalid_selection_start() {
+    // Tokens that cannot start a selection used to make the selection-set
+    // loop spin without consuming anything: an infinite loop in release
+    // builds and a debug assert in debug builds.
+    for source in [r#"{ name: "value" }"#, "{ ! }", "{ 1 }", r#"{ a "b" c }"#] {
+        let allocator = Allocator::default();
+        let ast = Parser::new(&allocator, source).parse();
+        assert!(ast.errors().len() > 0, "{source}");
+    }
+
+    // Recovery keeps the surrounding selections.
+    let allocator = Allocator::default();
+    let ast = Parser::new(&allocator, r#"{ a "b" c }"#).parse();
+    let ast::Definition::Operation(operation) = &ast.document().definitions[0] else {
+        panic!("expected operation definition");
+    };
+    let selections = &operation.selection_set.as_ref().unwrap().selections;
+    assert_eq!(selections.len(), 2);
+}
+
+#[test]
+fn all_fixture_files_parse_without_panicking() {
+    // Feed every fixture file through the parser, including the `.txt`
+    // expectation files, which act as garbage input.
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("test_data");
+    for dir in ["lexer/ok", "lexer/err", "parser/ok", "parser/err"] {
+        for entry in fs::read_dir(root.join(dir)).unwrap() {
+            let path = entry.unwrap().path();
+            let Ok(source) = fs::read_to_string(&path) else { continue };
+            let allocator = Allocator::default();
+            let _ast = Parser::new(&allocator, &source).parse();
+        }
+    }
+}
+
+#[test]
 #[ignore]
 fn ecosystem_graphql_corpus_has_no_parse_errors() {
     let root = std::env::var_os("OXC_GRAPHQL_ECOSYSTEM_REPOS")
