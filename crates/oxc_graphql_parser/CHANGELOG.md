@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.7](https://github.com/oxc-project/oxc-graphql-parser/compare/oxc-graphql-parser-v0.0.6...oxc-graphql-parser-v0.0.7) - 2026-07-12
+
+### Fixed
+
+- string values ending in an escaped quote lose the quote ([#53](https://github.com/oxc-project/oxc-graphql-parser/pull/53))
+- selection set loop spins forever on invalid selection start ([#52](https://github.com/oxc-project/oxc-graphql-parser/pull/52))
+
+### Other
+
+- extract definition_start helper for description-aware spans ([#54](https://github.com/oxc-project/oxc-graphql-parser/pull/54))
+- use Peekable::next_if_eq for CRLF normalization ([#50](https://github.com/oxc-project/oxc-graphql-parser/pull/50))
+- hint cold error paths with std::hint::cold_path ([#49](https://github.com/oxc-project/oxc-graphql-parser/pull/49))
+- lower MSRV to Rust 1.95.0 ([#48](https://github.com/oxc-project/oxc-graphql-parser/pull/48))
+
 ## [0.0.6](https://github.com/oxc-project/oxc-graphql-parser/compare/oxc-graphql-parser-v0.0.5...oxc-graphql-parser-v0.0.6) - 2026-07-08
 
 ### Fixed
