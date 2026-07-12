@@ -1421,7 +1421,10 @@ impl<'a> Parser<'a> {
                 content
             }
         } else {
-            let content = raw.trim_matches('"');
+            // Strip exactly one quote from each end: `trim_matches` would also
+            // eat a trailing escaped quote (`"abc\""` must keep its `"`).
+            let content =
+                raw.strip_prefix('"').and_then(|value| value.strip_suffix('"')).unwrap_or(raw);
             if content.contains('\\') {
                 self.allocator.alloc_str(&unescape_string(content))
             } else {
