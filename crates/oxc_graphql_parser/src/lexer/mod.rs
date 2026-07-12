@@ -7,6 +7,7 @@ use crate::Error;
 use crate::LimitTracker;
 use crate::lexer::cursor::Cursor;
 use crate::lexer::lookup::ByteClass;
+use std::hint::cold_path;
 pub use token::Token;
 pub use token_kind::TokenKind;
 
@@ -170,6 +171,7 @@ impl<'a> Cursor<'a> {
         let mut token = Token { kind: TokenKind::Eof, data: "", index: self.index() };
 
         let Some(c) = self.bump() else {
+            cold_path();
             // Report EOF at the end of the input rather than one byte past it.
             let end = self.source.len();
             self.offset = end;
@@ -217,7 +219,10 @@ impl<'a> Cursor<'a> {
             ByteClass::Zero => self.lex_number(NumberState::LeadingZero, token),
             ByteClass::Digit => self.lex_number(NumberState::IntegerPart, token),
             ByteClass::Minus => self.lex_number(NumberState::MinusSign, token),
-            ByteClass::Other => self.unexpected_character(c, &token),
+            ByteClass::Other => {
+                cold_path();
+                self.unexpected_character(c, &token)
+            }
         }
     }
 
@@ -311,11 +316,13 @@ impl<'a> Cursor<'a> {
     fn lex_string(&mut self, mut token: Token<'a>) -> Result<Token<'a>, Error> {
         loop {
             let Some(found) = memchr::memchr2(b'"', b'\\', &self.bytes[self.next..]) else {
+                cold_path();
                 return self.unterminated_string(&token);
             };
             let stop = self.next + found;
 
             if memchr::memchr2(b'\n', b'\r', &self.bytes[self.next..stop]).is_some() {
+                cold_path();
                 self.add_err(Error::with_loc("unexpected line terminator", String::new(), 0));
             }
 
@@ -330,6 +337,7 @@ impl<'a> Cursor<'a> {
 
             // Backslash escape sequence.
             let Some(c) = self.bump() else {
+                cold_path();
                 return self.unterminated_string(&token);
             };
             if c == b'u' {
@@ -337,6 +345,7 @@ impl<'a> Cursor<'a> {
                 // plain string content after recording an error.
                 for remaining in (1..=4usize).rev() {
                     let Some(c) = self.bump() else {
+                        cold_path();
                         return self.unterminated_string(&token);
                     };
                     if c == b'"' {
@@ -379,6 +388,7 @@ impl<'a> Cursor<'a> {
                     }
                 }
             } else if !is_escaped_char(c) {
+                cold_path();
                 let c = self.char_for_error(c);
                 self.add_err(Error::with_loc("unexpected escaped character", c.to_string(), 0));
             }
@@ -388,6 +398,7 @@ impl<'a> Cursor<'a> {
     fn lex_block_string(&mut self, mut token: Token<'a>) -> Result<Token<'a>, Error> {
         loop {
             let Some(found) = memchr::memchr2(b'"', b'\\', &self.bytes[self.next..]) else {
+                cold_path();
                 return self.unterminated_string(&token);
             };
             let stop = self.next + found;
@@ -413,6 +424,7 @@ impl<'a> Cursor<'a> {
             // literal backslashes and then the escape sequence.
             loop {
                 let Some(c) = self.bump() else {
+                    cold_path();
                     return self.unterminated_string(&token);
                 };
                 match c {
@@ -632,6 +644,7 @@ impl<'a> Cursor<'a> {
     #[inline]
     fn done(&mut self, token: Token<'a>) -> Result<Token<'a>, Error> {
         if let Some(mut err) = self.err.take() {
+            cold_path();
             err.set_data(token.data.to_string());
             err.index = token.index;
             return Err(err);
