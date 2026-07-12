@@ -1,4 +1,5 @@
 use std::fmt;
+use std::hint::cold_path;
 
 /// A LimitTracker enforces a particular limit within the parser. It keeps
 /// track of utilization so that we can report how close to a limit we
@@ -61,6 +62,7 @@ impl LimitTracker {
         }
         let reached = self.current > self.limit;
         if reached {
+            cold_path();
             // Caller is gonna return early, keep increments and decrements balanced:
             self.decrement()
         }
