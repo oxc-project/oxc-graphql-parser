@@ -29,6 +29,9 @@ criterion2 = { version = "3", default-features = false }
 [features]
 default = []
 codspeed = ["criterion2/codspeed"]
+# PROTOTYPE: opt out of the compile-time AST size asserts when a downstream build
+# shrinks `oxc_allocator::Box` (oxc's pointer-compression prototype).
+unsized-box-prototype = []
 
 [[bench]]
 name = "query"

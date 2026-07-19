@@ -617,7 +617,9 @@ pub struct InputValueDefinition<'a> {
 /// AST nodes are bulk data: parsers allocate thousands of them per document,
 /// so a size regression here is a memory and cache regression everywhere.
 /// If an intentional layout change trips these, update the constants.
-#[cfg(target_pointer_width = "64")]
+// PROTOTYPE: disabled for oxc's pointer-compression prototype, which shrinks
+// `oxc_allocator::Box` from 8 to 4 bytes and so changes every size below.
+#[cfg(all(target_pointer_width = "64", not(feature = "unsized-box-prototype")))]
 const _: () = {
     use std::mem::size_of;
 
