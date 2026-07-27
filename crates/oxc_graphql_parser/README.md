@@ -87,7 +87,7 @@ for definition in &document.definitions {
     if let ast::Definition::ObjectType(object_type) = definition {
         assert_eq!(object_type.name.as_str(), "ProductDimension");
 
-        for field in &object_type.fields {
+        for field in object_type.fields.iter().flat_map(|fields| &fields.fields) {
             println!("{}", field.name);
         }
     }
@@ -123,6 +123,7 @@ for definition in &document.definitions {
         let variables: Vec<String> = operation
             .variable_definitions
             .iter()
+            .flat_map(|definitions| &definitions.items)
             .map(|definition| definition.variable.name.to_string())
             .collect();
 

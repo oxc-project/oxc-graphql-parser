@@ -220,7 +220,7 @@ pub struct OperationDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub operation_type: OperationType,
     pub name: Option<Name<'a>>,
-    pub variable_definitions: AstVec<'a, VariableDefinition<'a>>,
+    pub variable_definitions: Option<VariableDefinitions<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub selection_set: Option<AstBox<'a, SelectionSet<'a>>>,
     pub span: Span,
@@ -230,8 +230,8 @@ pub struct OperationDefinition<'a> {
 pub struct FragmentDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
-    pub variable_definitions: AstVec<'a, VariableDefinition<'a>>,
-    pub type_condition: NamedType<'a>,
+    pub variable_definitions: Option<VariableDefinitions<'a>>,
+    pub type_condition: TypeCondition<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub selection_set: Option<AstBox<'a, SelectionSet<'a>>>,
     pub span: Span,
@@ -267,7 +267,7 @@ impl Selection<'_> {
 pub struct Field<'a> {
     pub alias: Option<Name<'a>>,
     pub name: Name<'a>,
-    pub arguments: AstVec<'a, Argument<'a>>,
+    pub arguments: Option<Arguments<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub selection_set: Option<AstBox<'a, SelectionSet<'a>>>,
     pub span: Span,
@@ -276,14 +276,14 @@ pub struct Field<'a> {
 #[derive(Debug)]
 pub struct FragmentSpread<'a> {
     pub name: Name<'a>,
-    pub arguments: AstVec<'a, Argument<'a>>,
+    pub arguments: Option<Arguments<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub span: Span,
 }
 
 #[derive(Debug)]
 pub struct InlineFragment<'a> {
-    pub type_condition: Option<NamedType<'a>>,
+    pub type_condition: Option<TypeCondition<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub selection_set: Option<AstBox<'a, SelectionSet<'a>>>,
     pub span: Span,
@@ -294,7 +294,7 @@ pub struct VariableDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub variable: Variable<'a>,
     pub ty: Option<Type<'a>>,
-    pub default_value: Option<Value<'a>>,
+    pub default_value: Option<DefaultValue<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub span: Span,
 }
@@ -315,7 +315,7 @@ pub struct Argument<'a> {
 #[derive(Debug)]
 pub struct Directive<'a> {
     pub name: Name<'a>,
-    pub arguments: AstVec<'a, Argument<'a>>,
+    pub arguments: Option<Arguments<'a>>,
     pub span: Span,
 }
 
@@ -437,6 +437,8 @@ pub struct NonNullType<'a> {
 pub struct SchemaDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub directives: AstVec<'a, Directive<'a>>,
+    /// No wrapper node: the spec inlines the `{`..`}` in the SchemaDefinition
+    /// production itself (no named production to mirror).
     pub root_operations: AstVec<'a, RootOperationTypeDefinition<'a>>,
     pub span: Span,
 }
@@ -444,6 +446,7 @@ pub struct SchemaDefinition<'a> {
 #[derive(Debug)]
 pub struct SchemaExtension<'a> {
     pub directives: AstVec<'a, Directive<'a>>,
+    /// No wrapper node: see [`SchemaDefinition::root_operations`].
     pub root_operations: AstVec<'a, RootOperationTypeDefinition<'a>>,
     pub span: Span,
 }
@@ -466,7 +469,7 @@ pub struct DirectiveExtension<'a> {
 pub struct DirectiveDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
-    pub arguments: AstVec<'a, InputValueDefinition<'a>>,
+    pub arguments: Option<ArgumentsDefinition<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub repeatable: bool,
     pub locations: AstVec<'a, DirectiveLocation<'a>>,
@@ -498,18 +501,18 @@ pub struct ScalarTypeExtension<'a> {
 pub struct ObjectTypeDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
-    pub interfaces: AstVec<'a, NamedType<'a>>,
+    pub implements: Option<ImplementsInterfaces<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub fields: AstVec<'a, FieldDefinition<'a>>,
+    pub fields: Option<FieldsDefinition<'a>>,
     pub span: Span,
 }
 
 #[derive(Debug)]
 pub struct ObjectTypeExtension<'a> {
     pub name: Name<'a>,
-    pub interfaces: AstVec<'a, NamedType<'a>>,
+    pub implements: Option<ImplementsInterfaces<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub fields: AstVec<'a, FieldDefinition<'a>>,
+    pub fields: Option<FieldsDefinition<'a>>,
     pub span: Span,
 }
 
@@ -517,18 +520,18 @@ pub struct ObjectTypeExtension<'a> {
 pub struct InterfaceTypeDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
-    pub interfaces: AstVec<'a, NamedType<'a>>,
+    pub implements: Option<ImplementsInterfaces<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub fields: AstVec<'a, FieldDefinition<'a>>,
+    pub fields: Option<FieldsDefinition<'a>>,
     pub span: Span,
 }
 
 #[derive(Debug)]
 pub struct InterfaceTypeExtension<'a> {
     pub name: Name<'a>,
-    pub interfaces: AstVec<'a, NamedType<'a>>,
+    pub implements: Option<ImplementsInterfaces<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub fields: AstVec<'a, FieldDefinition<'a>>,
+    pub fields: Option<FieldsDefinition<'a>>,
     pub span: Span,
 }
 
@@ -537,7 +540,7 @@ pub struct UnionTypeDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub members: AstVec<'a, NamedType<'a>>,
+    pub members: Option<UnionMemberTypes<'a>>,
     pub span: Span,
 }
 
@@ -545,7 +548,7 @@ pub struct UnionTypeDefinition<'a> {
 pub struct UnionTypeExtension<'a> {
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub members: AstVec<'a, NamedType<'a>>,
+    pub members: Option<UnionMemberTypes<'a>>,
     pub span: Span,
 }
 
@@ -554,7 +557,7 @@ pub struct EnumTypeDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub values: AstVec<'a, EnumValueDefinition<'a>>,
+    pub values: Option<EnumValuesDefinition<'a>>,
     pub span: Span,
 }
 
@@ -562,7 +565,7 @@ pub struct EnumTypeDefinition<'a> {
 pub struct EnumTypeExtension<'a> {
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub values: AstVec<'a, EnumValueDefinition<'a>>,
+    pub values: Option<EnumValuesDefinition<'a>>,
     pub span: Span,
 }
 
@@ -579,7 +582,7 @@ pub struct InputObjectTypeDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub fields: AstVec<'a, InputValueDefinition<'a>>,
+    pub fields: Option<InputFieldsDefinition<'a>>,
     pub span: Span,
 }
 
@@ -587,7 +590,7 @@ pub struct InputObjectTypeDefinition<'a> {
 pub struct InputObjectTypeExtension<'a> {
     pub name: Name<'a>,
     pub directives: AstVec<'a, Directive<'a>>,
-    pub fields: AstVec<'a, InputValueDefinition<'a>>,
+    pub fields: Option<InputFieldsDefinition<'a>>,
     pub span: Span,
 }
 
@@ -595,7 +598,7 @@ pub struct InputObjectTypeExtension<'a> {
 pub struct FieldDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
-    pub arguments: AstVec<'a, InputValueDefinition<'a>>,
+    pub arguments: Option<ArgumentsDefinition<'a>>,
     pub ty: Option<Type<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
     pub span: Span,
@@ -606,8 +609,88 @@ pub struct InputValueDefinition<'a> {
     pub description: Option<AstBox<'a, StringValue<'a>>>,
     pub name: Name<'a>,
     pub ty: Option<Type<'a>>,
-    pub default_value: Option<Value<'a>>,
+    pub default_value: Option<DefaultValue<'a>>,
     pub directives: AstVec<'a, Directive<'a>>,
+    pub span: Span,
+}
+
+/// `( Argument+ )`
+#[derive(Debug)]
+pub struct Arguments<'a> {
+    pub items: AstVec<'a, Argument<'a>>,
+    /// Covers `(`..`)`.
+    pub span: Span,
+}
+
+/// `( InputValueDefinition+ )` on field and directive definitions.
+#[derive(Debug)]
+pub struct ArgumentsDefinition<'a> {
+    pub items: AstVec<'a, InputValueDefinition<'a>>,
+    /// Covers `(`..`)`.
+    pub span: Span,
+}
+
+/// `( VariableDefinition+ )` on operations and fragments.
+#[derive(Debug)]
+pub struct VariableDefinitions<'a> {
+    pub items: AstVec<'a, VariableDefinition<'a>>,
+    /// Covers `(`..`)`.
+    pub span: Span,
+}
+
+/// `implements &? NamedType (& NamedType)*`
+#[derive(Debug)]
+pub struct ImplementsInterfaces<'a> {
+    pub interfaces: AstVec<'a, NamedType<'a>>,
+    /// Starts at the `implements` keyword.
+    pub span: Span,
+}
+
+/// `= Value`
+#[derive(Debug)]
+pub struct DefaultValue<'a> {
+    pub value: Value<'a>,
+    /// Starts at the `=` token.
+    pub span: Span,
+}
+
+/// `on NamedType`
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct TypeCondition<'a> {
+    pub named_type: NamedType<'a>,
+    /// Starts at the `on` keyword.
+    pub span: Span,
+}
+
+/// `= |? NamedType (| NamedType)*`
+#[derive(Debug)]
+pub struct UnionMemberTypes<'a> {
+    pub members: AstVec<'a, NamedType<'a>>,
+    /// Starts at the `=` token.
+    pub span: Span,
+}
+
+/// `{ FieldDefinition+ }`
+#[derive(Debug)]
+pub struct FieldsDefinition<'a> {
+    pub fields: AstVec<'a, FieldDefinition<'a>>,
+    /// Covers `{`..`}`.
+    pub span: Span,
+}
+
+/// `{ EnumValueDefinition+ }`
+#[derive(Debug)]
+pub struct EnumValuesDefinition<'a> {
+    pub values: AstVec<'a, EnumValueDefinition<'a>>,
+    /// Covers `{`..`}`.
+    pub span: Span,
+}
+
+/// `{ InputValueDefinition+ }`
+#[derive(Debug)]
+pub struct InputFieldsDefinition<'a> {
+    pub fields: AstVec<'a, InputValueDefinition<'a>>,
+    /// Covers `{`..`}`.
     pub span: Span,
 }
 
@@ -626,22 +709,22 @@ const _: () = {
     assert!(size_of::<StringValue>() == 48);
 
     assert!(size_of::<Definition>() == 16);
-    assert!(size_of::<OperationDefinition>() == 104);
-    assert!(size_of::<FragmentDefinition>() == 120);
+    assert!(size_of::<OperationDefinition>() == 112);
+    assert!(size_of::<FragmentDefinition>() == 136);
 
     assert!(size_of::<SelectionSet>() == 32);
     assert!(size_of::<Selection>() == 16);
-    assert!(size_of::<Field>() == 112);
-    assert!(size_of::<InlineFragment>() == 64);
+    assert!(size_of::<Field>() == 120);
+    assert!(size_of::<InlineFragment>() == 72);
 
     assert!(size_of::<Value>() == 16);
     assert!(size_of::<Argument>() == 48);
     assert!(size_of::<ObjectField>() == 48);
-    assert!(size_of::<Directive>() == 56);
+    assert!(size_of::<Directive>() == 64);
     assert!(size_of::<Type>() == 16);
 
-    assert!(size_of::<FieldDefinition>() == 104);
-    assert!(size_of::<InputValueDefinition>() == 96);
-    assert!(size_of::<VariableDefinition>() == 104);
+    assert!(size_of::<FieldDefinition>() == 112);
+    assert!(size_of::<InputValueDefinition>() == 104);
+    assert!(size_of::<VariableDefinition>() == 112);
     assert!(size_of::<EnumValueDefinition>() == 64);
 };

@@ -27,6 +27,7 @@ fn are_variables_unused() {
             let variables: Vec<String> = op_def
                 .variable_definitions
                 .iter()
+                .flat_map(|definitions| &definitions.items)
                 .map(|definition| definition.variable.name.to_string())
                 .collect();
 
@@ -49,7 +50,7 @@ fn get_variables_from_selection<'a>(
         match selection {
             ast::Selection::Field(field) => {
                 let mut vars = Vec::new();
-                for argument in &field.arguments {
+                for argument in field.arguments.iter().flat_map(|arguments| &arguments.items) {
                     collect_variable_value(argument.value.as_ref(), &mut vars);
                 }
                 used_vars.append(&mut vars);

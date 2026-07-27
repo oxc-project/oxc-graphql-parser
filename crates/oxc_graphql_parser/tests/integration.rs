@@ -25,9 +25,11 @@ type Query {
         panic!("expected object type definition");
     };
     assert_eq!(object.name.as_str(), "Query");
-    assert_eq!(object.fields.len(), 1);
-    assert_eq!(object.fields[0].name.as_str(), "hello");
-    assert_eq!(object.fields[0].arguments[0].name.as_str(), "name");
+    let fields = &object.fields.as_ref().expect("fields definition").fields;
+    assert_eq!(fields.len(), 1);
+    assert_eq!(fields[0].name.as_str(), "hello");
+    let arguments = fields[0].arguments.as_ref().expect("arguments definition");
+    assert_eq!(arguments.items[0].name.as_str(), "name");
 }
 
 #[test]
@@ -49,7 +51,10 @@ query GraphQuery($graph_id: ID!, $variant: String) {
         panic!("expected operation definition");
     };
     assert_eq!(operation.name.as_ref().unwrap().as_str(), "GraphQuery");
-    assert_eq!(operation.variable_definitions.len(), 2);
+    assert_eq!(
+        operation.variable_definitions.as_ref().expect("variable definitions").items.len(),
+        2
+    );
 
     let mut used = Vec::new();
     collect_variables(operation.selection_set.as_ref().unwrap(), &mut used);
@@ -89,8 +94,10 @@ query Q {
         panic!("expected fragment definition");
     };
     assert_eq!(fragment.name.as_str(), "variableProfilePic");
-    assert_eq!(fragment.variable_definitions.len(), 1);
-    assert_eq!(fragment.variable_definitions[0].variable.name.as_str(), "size");
+    let variable_definitions =
+        fragment.variable_definitions.as_ref().expect("variable definitions");
+    assert_eq!(variable_definitions.items.len(), 1);
+    assert_eq!(variable_definitions.items[0].variable.name.as_str(), "size");
 
     let ast::Definition::Operation(operation) = &ast.document().definitions[1] else {
         panic!("expected operation definition");
@@ -105,8 +112,9 @@ query Q {
         panic!("expected fragment spread");
     };
     assert_eq!(spread.name.as_str(), "variableProfilePic");
-    assert_eq!(spread.arguments.len(), 1);
-    assert_eq!(spread.arguments[0].name.as_str(), "size");
+    let arguments = spread.arguments.as_ref().expect("arguments");
+    assert_eq!(arguments.items.len(), 1);
+    assert_eq!(arguments.items[0].name.as_str(), "size");
 }
 
 #[test]
@@ -355,8 +363,10 @@ fn parser_parses_variable_definition_descriptions() {
     let ast::Definition::Operation(operation) = &ast.document().definitions[0] else {
         panic!("expected operation definition");
     };
-    assert_eq!(operation.variable_definitions.len(), 1);
-    let description = operation.variable_definitions[0].description.as_ref().unwrap();
+    let variable_definitions =
+        operation.variable_definitions.as_ref().expect("variable definitions");
+    assert_eq!(variable_definitions.items.len(), 1);
+    let description = variable_definitions.items[0].description.as_ref().unwrap();
     assert_eq!(description.value, "the id");
 }
 
@@ -465,7 +475,7 @@ fn ecosystem_graphql_corpus_has_no_parse_errors() {
 fn collect_variables<'a>(selection_set: &'a ast::SelectionSet<'_>, output: &mut Vec<&'a str>) {
     for selection in &selection_set.selections {
         if let ast::Selection::Field(field) = selection {
-            for argument in &field.arguments {
+            for argument in field.arguments.iter().flat_map(|arguments| &arguments.items) {
                 collect_variable_value(argument.value.as_ref(), output);
             }
             if let Some(selection_set) = &field.selection_set {

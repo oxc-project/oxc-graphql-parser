@@ -295,7 +295,7 @@ impl<'a> Parser<'a> {
                 description,
                 operation_type: OperationType::Query,
                 name: None,
-                variable_definitions: ArenaVec::new_in(&self.allocator),
+                variable_definitions: None,
                 directives: ArenaVec::new_in(&self.allocator),
                 selection_set,
                 span: self.span_from(start),
@@ -331,11 +331,10 @@ impl<'a> Parser<'a> {
         let variable_definitions = if self.experimental_fragment_arguments {
             self.parse_variable_definitions_if_present()
         } else {
-            ArenaVec::new_in(&self.allocator)
+            None
         };
 
-        self.expect_name_value("on");
-        let type_condition = self.parse_named_type().unwrap_or_else(|| self.missing_named_type());
+        let type_condition = self.parse_type_condition();
         let directives = self.parse_directives(Constness::NotConst);
         let selection_set = self.parse_required_selection_set();
 
@@ -446,8 +445,7 @@ impl<'a> Parser<'a> {
         self.expect(T![...], "expected ...");
 
         if self.peek_data() == Some("on") {
-            self.bump();
-            let type_condition = self.parse_named_type();
+            let type_condition = Some(self.parse_type_condition());
             let directives = self.parse_directives(Constness::NotConst);
             let selection_set = self.parse_required_selection_set();
             return Selection::InlineFragment(ArenaBox::new_in(
@@ -479,7 +477,7 @@ impl<'a> Parser<'a> {
         let arguments = if self.experimental_fragment_arguments {
             self.parse_arguments_if_present(Constness::NotConst)
         } else {
-            ArenaVec::new_in(&self.allocator)
+            None
         };
         let directives = self.parse_directives(Constness::NotConst);
         Selection::FragmentSpread(ArenaBox::new_in(
@@ -510,11 +508,12 @@ impl<'a> Parser<'a> {
         Field { alias, name, arguments, directives, selection_set, span: self.span_from(start) }
     }
 
-    fn parse_arguments_if_present(&mut self, constness: Constness) -> ArenaVec<'a, Argument<'a>> {
+    fn parse_arguments_if_present(&mut self, constness: Constness) -> Option<Arguments<'a>> {
         if self.peek() != Some(T!['(']) {
-            return ArenaVec::new_in(&self.allocator);
+            return None;
         }
 
+        let open_start = self.current_start();
         self.bump();
         let mark = self.scratch_mark();
         self.peek_while(|parser, kind| match kind {
@@ -536,10 +535,11 @@ impl<'a> Parser<'a> {
                 ControlFlow::Continue(())
             }
         });
-        self.drain_scratch(mark, |node| match node {
+        let items = self.drain_scratch(mark, |node| match node {
             ScratchNode::Argument(argument) => argument,
             _ => unreachable!("scratch stack discipline"),
-        })
+        });
+        Some(Arguments { items, span: self.span_from(open_start) })
     }
 
     fn parse_argument(&mut self, constness: Constness) -> Argument<'a> {
@@ -555,11 +555,12 @@ impl<'a> Parser<'a> {
         Argument { name, value, span: self.span_from(start) }
     }
 
-    fn parse_variable_definitions_if_present(&mut self) -> ArenaVec<'a, VariableDefinition<'a>> {
+    fn parse_variable_definitions_if_present(&mut self) -> Option<VariableDefinitions<'a>> {
         if self.peek() != Some(T!['(']) {
-            return ArenaVec::new_in(&self.allocator);
+            return None;
         }
 
+        let open_start = self.current_start();
         self.bump();
         let mark = self.scratch_mark();
         self.peek_while(|parser, kind| match kind {
@@ -584,10 +585,11 @@ impl<'a> Parser<'a> {
                 ControlFlow::Continue(())
             }
         });
-        self.drain_scratch(mark, |node| match node {
+        let items = self.drain_scratch(mark, |node| match node {
             ScratchNode::VariableDefinition(definition) => definition,
             _ => unreachable!("scratch stack discipline"),
-        })
+        });
+        Some(VariableDefinitions { items, span: self.span_from(open_start) })
     }
 
     fn parse_variable_definition(&mut self) -> VariableDefinition<'a> {
@@ -601,10 +603,7 @@ impl<'a> Parser<'a> {
         if self.peek() == Some(T![:]) {
             self.bump();
             ty = self.parse_type_inner();
-            if self.peek() == Some(T![=]) {
-                self.bump();
-                default_value = Some(self.parse_value(Constness::Const, false));
-            }
+            default_value = self.parse_default_value_if_present();
             directives = self.parse_directives(Constness::Const);
         } else {
             self.err("expected a Name");
@@ -998,13 +997,13 @@ impl<'a> Parser<'a> {
         let start = self.definition_start(&description);
         self.expect_name_value("type");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
-        let interfaces = self.parse_implements_interfaces();
+        let implements = self.parse_implements_interfaces_if_present();
         let directives = self.parse_directives(Constness::Const);
         let fields = self.parse_fields_definition_if_present();
         ObjectTypeDefinition {
             description,
             name,
-            interfaces,
+            implements,
             directives,
             fields,
             span: self.span_from(start),
@@ -1014,13 +1013,13 @@ impl<'a> Parser<'a> {
     fn parse_object_type_extension_from(&mut self, start: u32) -> ObjectTypeExtension<'a> {
         self.expect_name_value("type");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
-        let interfaces = self.parse_implements_interfaces();
+        let implements = self.parse_implements_interfaces_if_present();
         let directives = self.parse_directives(Constness::Const);
         let fields = self.parse_fields_definition_if_present();
-        if interfaces.is_empty() && directives.is_empty() && fields.is_empty() {
+        if implements.is_none() && directives.is_empty() && fields.is_none() {
             self.err("expected Implements Interfaces, Directives, or Fields Definition");
         }
-        ObjectTypeExtension { name, interfaces, directives, fields, span: self.span_from(start) }
+        ObjectTypeExtension { name, implements, directives, fields, span: self.span_from(start) }
     }
 
     fn parse_interface_type_definition(
@@ -1030,13 +1029,13 @@ impl<'a> Parser<'a> {
         let start = self.definition_start(&description);
         self.expect_name_value("interface");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
-        let interfaces = self.parse_implements_interfaces();
+        let implements = self.parse_implements_interfaces_if_present();
         let directives = self.parse_directives(Constness::Const);
         let fields = self.parse_fields_definition_if_present();
         InterfaceTypeDefinition {
             description,
             name,
-            interfaces,
+            implements,
             directives,
             fields,
             span: self.span_from(start),
@@ -1046,20 +1045,21 @@ impl<'a> Parser<'a> {
     fn parse_interface_type_extension_from(&mut self, start: u32) -> InterfaceTypeExtension<'a> {
         self.expect_name_value("interface");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
-        let interfaces = self.parse_implements_interfaces();
+        let implements = self.parse_implements_interfaces_if_present();
         let directives = self.parse_directives(Constness::Const);
         let fields = self.parse_fields_definition_if_present();
-        if interfaces.is_empty() && directives.is_empty() && fields.is_empty() {
+        if implements.is_none() && directives.is_empty() && fields.is_none() {
             self.err("expected an Implements Interfaces, Directives, or a Fields Definition");
         }
-        InterfaceTypeExtension { name, interfaces, directives, fields, span: self.span_from(start) }
+        InterfaceTypeExtension { name, implements, directives, fields, span: self.span_from(start) }
     }
 
-    fn parse_implements_interfaces(&mut self) -> ArenaVec<'a, NamedType<'a>> {
+    fn parse_implements_interfaces_if_present(&mut self) -> Option<ImplementsInterfaces<'a>> {
         if self.peek_data() != Some("implements") {
-            return ArenaVec::new_in(&self.allocator);
+            return None;
         }
 
+        let start = self.current_start();
         self.bump();
         if self.peek() == Some(T![&]) {
             self.bump();
@@ -1080,14 +1080,15 @@ impl<'a> Parser<'a> {
                 break;
             }
         }
-        interfaces
+        Some(ImplementsInterfaces { interfaces, span: self.span_from(start) })
     }
 
-    fn parse_fields_definition_if_present(&mut self) -> ArenaVec<'a, FieldDefinition<'a>> {
+    fn parse_fields_definition_if_present(&mut self) -> Option<FieldsDefinition<'a>> {
         if self.peek() != Some(T!['{']) {
-            return ArenaVec::new_in(&self.allocator);
+            return None;
         }
 
+        let open_start = self.current_start();
         self.bump();
         let mark = self.scratch_mark();
         self.peek_while(|parser, kind| match kind {
@@ -1112,10 +1113,11 @@ impl<'a> Parser<'a> {
                 ControlFlow::Continue(())
             }
         });
-        self.drain_scratch(mark, |node| match node {
+        let fields = self.drain_scratch(mark, |node| match node {
             ScratchNode::FieldDefinition(field) => field,
             _ => unreachable!("scratch stack discipline"),
-        })
+        });
+        Some(FieldsDefinition { fields, span: self.span_from(open_start) })
     }
 
     fn parse_field_definition(&mut self) -> FieldDefinition<'a> {
@@ -1141,11 +1143,12 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn parse_arguments_definition_if_present(&mut self) -> ArenaVec<'a, InputValueDefinition<'a>> {
+    fn parse_arguments_definition_if_present(&mut self) -> Option<ArgumentsDefinition<'a>> {
         if self.peek() != Some(T!['(']) {
-            return ArenaVec::new_in(&self.allocator);
+            return None;
         }
 
+        let open_start = self.current_start();
         self.bump();
         let mark = self.scratch_mark();
         self.peek_while(|parser, kind| match kind {
@@ -1167,10 +1170,11 @@ impl<'a> Parser<'a> {
                 ControlFlow::Continue(())
             }
         });
-        self.drain_scratch(mark, |node| match node {
+        let items = self.drain_scratch(mark, |node| match node {
             ScratchNode::InputValueDefinition(definition) => definition,
             _ => unreachable!("scratch stack discipline"),
-        })
+        });
+        Some(ArgumentsDefinition { items, span: self.span_from(open_start) })
     }
 
     fn parse_input_value_definition(&mut self) -> InputValueDefinition<'a> {
@@ -1184,12 +1188,7 @@ impl<'a> Parser<'a> {
             self.err("expected a Type");
             None
         };
-        let default_value = if self.peek() == Some(T![=]) {
-            self.bump();
-            Some(self.parse_value(Constness::Const, false))
-        } else {
-            None
-        };
+        let default_value = self.parse_default_value_if_present();
         let directives = self.parse_directives(Constness::Const);
         InputValueDefinition {
             description,
@@ -1218,17 +1217,18 @@ impl<'a> Parser<'a> {
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
         let members = self.parse_union_members_if_present();
-        if directives.is_empty() && members.is_empty() {
+        if directives.is_empty() && members.is_none() {
             self.err("expected Directives or Union Member Types");
         }
         UnionTypeExtension { name, directives, members, span: self.span_from(start) }
     }
 
-    fn parse_union_members_if_present(&mut self) -> ArenaVec<'a, NamedType<'a>> {
+    fn parse_union_members_if_present(&mut self) -> Option<UnionMemberTypes<'a>> {
         if self.peek() != Some(T![=]) {
-            return ArenaVec::new_in(&self.allocator);
+            return None;
         }
 
+        let start = self.current_start();
         self.bump();
         if self.peek() == Some(T![|]) {
             self.bump();
@@ -1249,7 +1249,7 @@ impl<'a> Parser<'a> {
                 break;
             }
         }
-        members
+        Some(UnionMemberTypes { members, span: self.span_from(start) })
     }
 
     fn parse_enum_type_definition(
@@ -1269,17 +1269,18 @@ impl<'a> Parser<'a> {
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
         let values = self.parse_enum_values_definition_if_present();
-        if directives.is_empty() && values.is_empty() {
+        if directives.is_empty() && values.is_none() {
             self.err("expected Directives or Enum Values Definition");
         }
         EnumTypeExtension { name, directives, values, span: self.span_from(start) }
     }
 
-    fn parse_enum_values_definition_if_present(&mut self) -> ArenaVec<'a, EnumValueDefinition<'a>> {
+    fn parse_enum_values_definition_if_present(&mut self) -> Option<EnumValuesDefinition<'a>> {
         if self.peek() != Some(T!['{']) {
-            return ArenaVec::new_in(&self.allocator);
+            return None;
         }
 
+        let open_start = self.current_start();
         self.bump();
         let mut values = ArenaVec::new_in(&self.allocator);
         self.peek_while(|parser, kind| match kind {
@@ -1303,7 +1304,7 @@ impl<'a> Parser<'a> {
                 ControlFlow::Continue(())
             }
         });
-        values
+        Some(EnumValuesDefinition { values, span: self.span_from(open_start) })
     }
 
     fn parse_enum_value_definition(&mut self) -> EnumValueDefinition<'a> {
@@ -1343,19 +1344,18 @@ impl<'a> Parser<'a> {
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
         let fields = self.parse_input_fields_definition_if_present();
-        if directives.is_empty() && fields.is_empty() {
+        if directives.is_empty() && fields.is_none() {
             self.err("expected Directives or Input Fields Definition");
         }
         InputObjectTypeExtension { name, directives, fields, span: self.span_from(start) }
     }
 
-    fn parse_input_fields_definition_if_present(
-        &mut self,
-    ) -> ArenaVec<'a, InputValueDefinition<'a>> {
+    fn parse_input_fields_definition_if_present(&mut self) -> Option<InputFieldsDefinition<'a>> {
         if self.peek() != Some(T!['{']) {
-            return ArenaVec::new_in(&self.allocator);
+            return None;
         }
 
+        let open_start = self.current_start();
         self.bump();
         let mark = self.scratch_mark();
         self.peek_while(|parser, kind| match kind {
@@ -1380,10 +1380,11 @@ impl<'a> Parser<'a> {
                 ControlFlow::Continue(())
             }
         });
-        self.drain_scratch(mark, |node| match node {
+        let fields = self.drain_scratch(mark, |node| match node {
             ScratchNode::InputValueDefinition(field) => field,
             _ => unreachable!("scratch stack discipline"),
-        })
+        });
+        Some(InputFieldsDefinition { fields, span: self.span_from(open_start) })
     }
 
     fn parse_description_if_present(&mut self) -> Option<ArenaBox<'a, StringValue<'a>>> {
@@ -1454,6 +1455,26 @@ impl<'a> Parser<'a> {
         } else {
             self.err(message);
         }
+    }
+
+    /// `on NamedType`. The `on` keyword is required;
+    /// on error recovery the condition's type is synthesized as missing and the span collapses.
+    fn parse_type_condition(&mut self) -> TypeCondition<'a> {
+        let start = self.current_start();
+        self.expect_name_value("on");
+        let named_type = self.parse_named_type().unwrap_or_else(|| self.missing_named_type());
+        TypeCondition { named_type, span: self.span_from(start) }
+    }
+
+    /// `= Value[Const]`, when present.
+    fn parse_default_value_if_present(&mut self) -> Option<DefaultValue<'a>> {
+        if self.peek() != Some(T![=]) {
+            return None;
+        }
+        let start = self.current_start();
+        self.bump();
+        let value = self.parse_value(Constness::Const, false);
+        Some(DefaultValue { value, span: self.span_from(start) })
     }
 
     fn missing_name(&self) -> Name<'a> {

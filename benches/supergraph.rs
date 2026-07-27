@@ -18,7 +18,7 @@ fn parse_schema(schema: &str) {
     // Simulate a basic field traversal operation.
     for definition in &document.definitions {
         if let ast::Definition::ObjectType(operation) = definition {
-            for field in &operation.fields {
+            for field in operation.fields.iter().flat_map(|fields| &fields.fields) {
                 std::hint::black_box(&field.ty);
             }
         }
