@@ -15,6 +15,7 @@ categories = [
     "parsing",
     "web-programming",
 ]
+include = ["src/**/*", "LICENSE-*", "README.md", "CHANGELOG.md"]
 
 [dependencies]
 memchr = "2.6.1"
