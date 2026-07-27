@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.9](https://github.com/oxc-project/oxc-graphql-parser/compare/oxc-graphql-parser-v0.0.8...oxc-graphql-parser-v0.0.9) - 2026-07-27
+
+### Added
+
+- [**breaking**] add grammar-production nodes ([#66](https://github.com/oxc-project/oxc-graphql-parser/pull/66))
+
 ## [0.0.8](https://github.com/oxc-project/oxc-graphql-parser/compare/oxc-graphql-parser-v0.0.7...oxc-graphql-parser-v0.0.8) - 2026-07-27
 
 ### Other
