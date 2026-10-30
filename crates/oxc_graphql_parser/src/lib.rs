@@ -1,5 +1,20 @@
-#![doc = include_str!("../README.md")]
-#![allow(rustdoc::bare_urls, rustdoc::broken_intra_doc_links, rustdoc::invalid_rust_codeblocks)]
+//! oxc-graphql-parser is an error-resilient GraphQL lexer and parser
+//! that produces a typed AST.
+//!
+//! ## Basic Usage
+//!
+//! ```rust
+//! use oxc_graphql_parser::{Allocator, Parser};
+//!
+//! let allocator = Allocator::default();
+//! let ast = Parser::new(&allocator, "union SearchResult = Photo | Person").parse();
+//!
+//! // `parse` always returns an AST; check the errors before walking it.
+//! assert_eq!(ast.errors().len(), 0);
+//! for definition in &ast.document().definitions {
+//!     println!("{definition:?}");
+//! }
+//! ```
 
 pub mod ast;
 mod lexer;
