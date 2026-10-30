@@ -2,32 +2,31 @@
 
 This is a fork of [apollographql/apollo-rs](https://github.com/apollographql/apollo-rs) for Oxfmt; only the parser remains.
 
-Rust tooling for parsing GraphQL documents.
+`oxc-graphql-parser` is an error-resilient GraphQL lexer and parser that produces a typed AST.
 
-This repository currently contains one crate:
+How it parses, and why, is in [AGENTS.md](https://github.com/oxc-project/oxc-graphql-parser/blob/main/AGENTS.md).
 
-- [`oxc-graphql-parser`](crates/oxc_graphql_parser) - a spec-compliant GraphQL lexer and parser that produces a typed AST.
+## Example
 
-## Status
+```rust
+use oxc_graphql_parser::{Allocator, Parser};
 
-`oxc-graphql-parser` is a living project that keeps evolving and is being used in production.
-If you try it and run into trouble, please open an [issue].
+let allocator = Allocator::default();
+let ast = Parser::new(&allocator, "union SearchResult = Photo | Person").parse();
+assert_eq!(ast.errors().len(), 0);
+println!("{:#?}", ast.document());
+```
 
-## Rust Versions
-
-`oxc-graphql-parser` is tested on the latest stable version of Rust.
-Older versions may or may not be compatible.
+More examples are available in [`examples`](https://github.com/oxc-project/oxc-graphql-parser/tree/main/crates/oxc_graphql_parser/examples).
 
 ## License
 
 Licensed under either of:
 
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or <https://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <https://opensource.org/licenses/MIT>)
+- Apache License, Version 2.0 ([LICENSE-APACHE](https://github.com/oxc-project/oxc-graphql-parser/blob/main/LICENSE-APACHE) or <https://www.apache.org/licenses/LICENSE-2.0>)
+- MIT license ([LICENSE-MIT](https://github.com/oxc-project/oxc-graphql-parser/blob/main/LICENSE-MIT) or <https://opensource.org/licenses/MIT>)
 
 at your option.
-
-[issue]: https://github.com/oxc-project/oxc-graphql-parser/issues/new/choose
 
 # [Sponsored By](https://oxc.rs/sponsor)
 

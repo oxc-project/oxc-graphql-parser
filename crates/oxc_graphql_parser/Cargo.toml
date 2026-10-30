@@ -6,7 +6,8 @@ rust-version = "1.95.0"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/oxc-project/oxc-graphql-parser"
 documentation = "https://docs.rs/oxc-graphql-parser"
-description = "Spec-compliant GraphQL parser."
+readme = "../../README.md"
+description = "Error-resilient GraphQL lexer and parser."
 keywords = ["graphql", "parser", "graphql-tooling", "oxc"]
 categories = [
     "compilers",
@@ -15,7 +16,7 @@ categories = [
     "parsing",
     "web-programming",
 ]
-include = ["src/**/*", "LICENSE-*", "README.md", "CHANGELOG.md"]
+include = ["src/**/*", "LICENSE-*", "CHANGELOG.md"]
 
 [dependencies]
 memchr = "2.6.1"
