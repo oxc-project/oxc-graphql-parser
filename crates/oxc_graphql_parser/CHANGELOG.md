@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.10](https://github.com/oxc-project/oxc-graphql-parser/compare/oxc-graphql-parser-v0.0.9...oxc-graphql-parser-v0.0.10) - 2026-10-30
+
+### Other
+
+- consolidate docs into AGENTS.md ([#106](https://github.com/oxc-project/oxc-graphql-parser/pull/106))
+
 ## [0.0.9](https://github.com/oxc-project/oxc-graphql-parser/compare/oxc-graphql-parser-v0.0.8...oxc-graphql-parser-v0.0.9) - 2026-07-27
 
 ### Added
