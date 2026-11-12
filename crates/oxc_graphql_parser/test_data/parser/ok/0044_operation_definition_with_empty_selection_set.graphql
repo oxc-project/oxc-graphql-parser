@@ -1,0 +1,2 @@
+query {}
+{ a {} b { ... on T { } } } query Q @d { } fragment F on T {}

@@ -9,7 +9,7 @@ It is the parsing layer for oxc's GraphQL formatter (`oxc_formatter_graphql`).
 The reference is graphql-js v17.x (Prettier's GraphQL parser), not one spec edition.
 Upstream follows spec editions and stops at October 2021; what graphql-js parses beyond that is added here.
 
-- Executable descriptions, directives on directives and `extend directive` are always on.
+- Executable descriptions, directives on directives, `extend directive` and empty selection sets are always on.
 - Fragment arguments (`...F(size: $size)`, and the legacy `fragment F($x: Int) on T`) are behind `Parser::experimental_fragment_arguments`.
   Parser options follow graphql-js's; this is the only one kept.
 

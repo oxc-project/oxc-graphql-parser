@@ -340,7 +340,9 @@ impl<'a> Cursor<'a> {
                 cold_path();
                 return self.unterminated_string(&token);
             };
-            if c == b'u' {
+            if c == b'u' && self.eatc(b'{') {
+                self.lex_braced_unicode_escape();
+            } else if c == b'u' {
                 // `\uXXXX`: four hex digits. A non-hex byte is consumed as
                 // plain string content after recording an error.
                 for remaining in (1..=4usize).rev() {
@@ -372,15 +374,15 @@ impl<'a> Cursor<'a> {
                         // `is_ascii_hexdigit()` checks in previous iterations ensures
                         // this `unwrap()` does not panic:
                         let code_point = u32::from_str_radix(hex, 16).unwrap();
-                        if char::from_u32(code_point).is_none() {
-                            // TODO: https://github.com/oxc-project/oxc-graphql-parser/issues/657 needs
-                            // changes both here and in `ast/node_ext.rs`
+                        // Four hex digits fail only as a surrogate, a leading one (up to U+DBFF) may pair
+                        if char::from_u32(code_point).is_none()
+                            && !(code_point <= 0xDBFF && self.eat_trailing_surrogate_escape())
+                        {
+                            cold_path();
                             let escape_sequence_start = hex_start - 2; // include "\u"
                             let escape_sequence = &self.source[escape_sequence_start..hex_end];
                             self.add_err(Error::with_loc(
-                                "surrogate code point is invalid in unicode escape sequence \
-                                 (paired surrogate not supported yet: \
-                                 https://github.com/oxc-project/oxc-graphql-parser/issues/657)",
+                                "unpaired surrogate in unicode escape sequence",
                                 escape_sequence.to_owned(),
                                 0,
                             ));
@@ -393,6 +395,43 @@ impl<'a> Cursor<'a> {
                 self.add_err(Error::with_loc("unexpected escaped character", c.to_string(), 0));
             }
         }
+    }
+
+    /// `\u{X...}` after its `\u{`: one to eight hex digits naming a scalar value, as in graphql-js.
+    /// An invalid one records an error, and the rest lexes as plain string content.
+    fn lex_braced_unicode_escape(&mut self) {
+        let escape_start = self.offset - 2; // include "\u"
+        let digits_start = self.next;
+        while self.next < self.bytes.len() && self.bytes[self.next].is_ascii_hexdigit() {
+            self.next += 1;
+        }
+        let digits = &self.source[digits_start..self.next];
+        let valid = digits.len() <= 8
+            && u32::from_str_radix(digits, 16).ok().and_then(char::from_u32).is_some()
+            && self.eatc(b'}');
+        if !valid {
+            cold_path();
+            self.add_err(Error::with_loc(
+                "invalid unicode escape sequence",
+                self.source[escape_start..self.next].to_owned(),
+                0,
+            ));
+        }
+    }
+
+    /// Consumes a `\uXXXX` naming a trailing surrogate (U+DC00 to U+DFFF), if one is next.
+    fn eat_trailing_surrogate_escape(&mut self) -> bool {
+        let is_trailing = self
+            .source
+            .get(self.next..self.next + 6)
+            .and_then(|escape| escape.strip_prefix("\\u"))
+            .and_then(|hex| u32::from_str_radix(hex, 16).ok())
+            .is_some_and(|code_point| (0xDC00..=0xDFFF).contains(&code_point));
+        if is_trailing {
+            self.next += 6;
+            self.offset = self.next - 1;
+        }
+        is_trailing
     }
 
     fn lex_block_string(&mut self, mut token: Token<'a>) -> Result<Token<'a>, Error> {
