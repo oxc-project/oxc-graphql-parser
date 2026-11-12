@@ -41,4 +41,6 @@ CI (`.github/workflows`) runs check, test, clippy, doc and typos.
 
 - `test_data/{lexer,parser}/{ok,err}/*.graphql` is a corpus:
   each file must lex back to its source when it lexes without errors, and must parse without panicking.
+  An `ok` file has no errors and an `err` file at least one (from the lexer for `lexer/`, the parser for `parser/`);
+  a case that needs its own error goes in a unit test (`tests/lexer.rs`, `tests/integration.rs`).
   The `.txt` files beside them are not compared; they serve as garbage input.
