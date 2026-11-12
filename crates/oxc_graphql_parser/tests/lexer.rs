@@ -192,3 +192,27 @@ fn graphql_files(path: &str) -> Vec<PathBuf> {
     files.sort();
     files
 }
+
+#[test]
+fn unicode_escapes() {
+    // Braced (`\u{...}`, one to eight hex digits naming a scalar value)
+    // and a surrogate pair, as graphql-js reads them.
+    for ok in [r#""\u{1F600}""#, r#""\u{41}\u{00000041}""#, r#""\uD83D\uDE00""#] {
+        let (_, errors) = Lexer::new(ok).lex();
+        assert!(errors.is_empty(), "{ok}: {errors:?}");
+    }
+    for err in [
+        r#""\u{}""#,
+        r#""\u{110000}""#,
+        r#""\u{D800}""#,
+        r#""\u{000000041}""#,
+        r#""\u{41""#,
+        r#""\u{4G}""#,
+        r#""\uD800""#,
+        r#""\uDE00""#,
+        r#""\uD83DA""#,
+    ] {
+        let (_, errors) = Lexer::new(err).lex();
+        assert_eq!(errors.len(), 1, "{err}: {errors:?}");
+    }
+}

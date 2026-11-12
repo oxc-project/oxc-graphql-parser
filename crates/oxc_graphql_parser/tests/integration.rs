@@ -534,3 +534,18 @@ fn collect_graphql_files(dir: &Path, files: &mut Vec<PathBuf>) {
     }
     files.sort();
 }
+
+#[test]
+fn parser_unescapes_unicode_escapes() {
+    let source = r#"
+"\u{1F600} \uD83D\uDE00 \u{41}\u0042"
+scalar A
+"#;
+    let allocator = Allocator::default();
+    let ast = Parser::new(&allocator, source).parse();
+    assert_eq!(ast.errors().len(), 0);
+    let ast::Definition::ScalarType(scalar) = &ast.document().definitions[0] else {
+        panic!("expected scalar definition");
+    };
+    assert_eq!(scalar.description.as_ref().unwrap().value, "\u{1F600} \u{1F600} AB");
+}

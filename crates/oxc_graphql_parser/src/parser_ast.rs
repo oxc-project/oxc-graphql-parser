@@ -396,10 +396,8 @@ impl<'a> Parser<'a> {
         let mark = self.scratch_mark();
 
         self.peek_while(|parser, kind| match kind {
+            // May be empty (`{}`), as in graphql-js 17 (graphql/graphql-spec#1227)
             T!['}'] => {
-                if parser.scratch.len() == mark {
-                    parser.err("expected Selection");
-                }
                 parser.bump();
                 ControlFlow::Break(())
             }
@@ -1643,10 +1641,18 @@ fn unescape_string(input: &str) -> String {
             'r' => output.push('\r'),
             't' => output.push('\t'),
             'u' => {
-                let value = iter.by_ref().take(4).fold(0, |acc, c| {
-                    let digit = c.to_digit(16).unwrap_or(0);
-                    (acc << 4) + digit
-                });
+                let mut value = unescape_unicode(&mut iter);
+                // A leading surrogate pairs with a trailing `\uXXXX` one (`\uD83D\uDE00`)
+                if (0xD800..=0xDBFF).contains(&value) {
+                    let mut lookahead = iter.clone();
+                    if lookahead.next() == Some('\\') && lookahead.next() == Some('u') {
+                        let trailing = unescape_unicode(&mut lookahead);
+                        if (0xDC00..=0xDFFF).contains(&trailing) {
+                            value = 0x10000 + ((value - 0xD800) << 10) + (trailing - 0xDC00);
+                            iter = lookahead;
+                        }
+                    }
+                }
                 if let Some(c) = char::from_u32(value) {
                     output.push(c);
                 }
@@ -1655,6 +1661,17 @@ fn unescape_string(input: &str) -> String {
         }
     }
     output
+}
+
+/// The code point of a `\uXXXX` or `\u{X...}` escape, after its `\u`.
+fn unescape_unicode(iter: &mut std::str::Chars<'_>) -> u32 {
+    let hex = |acc: u32, c: char| (acc << 4) | c.to_digit(16).unwrap_or(0);
+    if iter.as_str().starts_with('{') {
+        iter.next();
+        iter.by_ref().take_while(|&c| c != '}').fold(0, hex)
+    } else {
+        iter.by_ref().take(4).fold(0, hex)
+    }
 }
 
 fn normalize_block_string(raw: &str) -> String {
