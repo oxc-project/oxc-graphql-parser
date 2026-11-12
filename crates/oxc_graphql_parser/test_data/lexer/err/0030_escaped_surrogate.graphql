@@ -1,6 +1,5 @@
-# TODO: emit two errors: https://github.com/oxc-project/oxc-graphql-parser/issues/319
-"split pair \uD83D \uDE00"
-
-"Backwards pair \uDE00\uD83D"
-"Lone lead surrogate \uD83E"
-"Lone trail surrogate \uDD80"
+"Lone lead surrogate \uD83D"
+"Lone trail surrogate \uDCA9"
+"Backwards pair \uDCA9\uD83D"
+"Split pair \uD83D \uDCA9"
+"Lead surrogate followed by non-surrogate escape \uD83DA"

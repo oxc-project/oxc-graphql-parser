@@ -36,6 +36,24 @@ fn lexer_roundtrip_corpus() {
 }
 
 #[test]
+fn lexer_ok_fixtures_have_no_errors() {
+    for path in graphql_files("lexer/ok") {
+        let source = fs::read_to_string(&path).unwrap();
+        let (_, errors) = Lexer::new(&source).lex();
+        assert!(errors.is_empty(), "{}: {errors:?}", path.display());
+    }
+}
+
+#[test]
+fn lexer_err_fixtures_have_errors() {
+    for path in graphql_files("lexer/err") {
+        let source = fs::read_to_string(&path).unwrap();
+        let (_, errors) = Lexer::new(&source).lex();
+        assert!(!errors.is_empty(), "{}", path.display());
+    }
+}
+
+#[test]
 fn unterminated_string() {
     let schema = r#"
 type Query {
@@ -211,6 +229,9 @@ fn unicode_escapes() {
         r#""\uD800""#,
         r#""\uDE00""#,
         r#""\uD83DA""#,
+        r#""\u{DCA9}""#,
+        r#""\uDCA9\uD83D""#,
+        r#""\uD83D \uDCA9""#,
     ] {
         let (_, errors) = Lexer::new(err).lex();
         assert_eq!(errors.len(), 1, "{err}: {errors:?}");
