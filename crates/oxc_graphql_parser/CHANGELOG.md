@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.11](https://github.com/oxc-project/oxc-graphql-parser/compare/oxc-graphql-parser-v0.0.10...oxc-graphql-parser-v0.0.11) - 2026-11-13
+
+### Other
+
+- inherit workspace lints in `crates/oxc_graphql_parser` ([#116](https://github.com/oxc-project/oxc-graphql-parser/pull/116))
+- *(rust)* bump toolchain to 1.100.0 and MSRV to 1.98.0 ([#114](https://github.com/oxc-project/oxc-graphql-parser/pull/114))
+
 ## [0.0.10](https://github.com/oxc-project/oxc-graphql-parser/compare/oxc-graphql-parser-v0.0.9...oxc-graphql-parser-v0.0.10) - 2026-11-12
 
 ### Added
