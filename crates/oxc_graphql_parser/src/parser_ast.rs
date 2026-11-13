@@ -70,16 +70,19 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[must_use]
     pub fn recursion_limit(mut self, recursion_limit: usize) -> Self {
         self.recursion_limit = LimitTracker::new(recursion_limit);
         self
     }
 
+    #[must_use]
     pub fn token_limit(mut self, token_limit: usize) -> Self {
         self.lexer = self.lexer.with_limit(token_limit);
         self
     }
 
+    #[must_use]
     pub fn experimental_fragment_arguments(mut self, allow: bool) -> Self {
         self.experimental_fragment_arguments = allow;
         self
@@ -287,7 +290,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> OperationDefinition<'a> {
-        let start = self.definition_start(&description);
+        let start = self.definition_start(description.as_deref());
 
         if self.peek() == Some(T!['{']) {
             let selection_set = Some(self.parse_alloc_selection_set());
@@ -324,7 +327,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> FragmentDefinition<'a> {
-        let start = self.definition_start(&description);
+        let start = self.definition_start(description.as_deref());
         self.expect_name_value("fragment");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
 
@@ -845,7 +848,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> SchemaDefinition<'a> {
-        let start = self.definition_start(&description);
+        let start = self.definition_start(description.as_deref());
         self.expect_name_value("schema");
         let directives = self.parse_directives(Constness::Const);
         let root_operations = self.parse_root_operation_types_if_present();
@@ -915,7 +918,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> DirectiveDefinition<'a> {
-        let start = self.definition_start(&description);
+        let start = self.definition_start(description.as_deref());
         self.expect_name_value("directive");
         self.expect(T![@], "expected @ symbol");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
@@ -971,7 +974,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> ScalarTypeDefinition<'a> {
-        let start = self.definition_start(&description);
+        let start = self.definition_start(description.as_deref());
         self.expect_name_value("scalar");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
@@ -992,7 +995,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> ObjectTypeDefinition<'a> {
-        let start = self.definition_start(&description);
+        let start = self.definition_start(description.as_deref());
         self.expect_name_value("type");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let implements = self.parse_implements_interfaces_if_present();
@@ -1024,7 +1027,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> InterfaceTypeDefinition<'a> {
-        let start = self.definition_start(&description);
+        let start = self.definition_start(description.as_deref());
         self.expect_name_value("interface");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let implements = self.parse_implements_interfaces_if_present();
@@ -1202,7 +1205,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> UnionTypeDefinition<'a> {
-        let start = self.definition_start(&description);
+        let start = self.definition_start(description.as_deref());
         self.expect_name_value("union");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
@@ -1254,7 +1257,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> EnumTypeDefinition<'a> {
-        let start = self.definition_start(&description);
+        let start = self.definition_start(description.as_deref());
         self.expect_name_value("enum");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
@@ -1320,7 +1323,7 @@ impl<'a> Parser<'a> {
         &mut self,
         description: Option<ArenaBox<'a, StringValue<'a>>>,
     ) -> InputObjectTypeDefinition<'a> {
-        let start = self.definition_start(&description);
+        let start = self.definition_start(description.as_deref());
         self.expect_name_value("input");
         let name = self.parse_name().unwrap_or_else(|| self.missing_name());
         let directives = self.parse_directives(Constness::Const);
@@ -1396,8 +1399,8 @@ impl<'a> Parser<'a> {
 
     /// The span start of a definition: the start of its already-parsed
     /// description if it has one, otherwise the start of the current token.
-    fn definition_start(&mut self, description: &Option<ArenaBox<'a, StringValue<'a>>>) -> u32 {
-        description.as_ref().map_or_else(|| self.current_start(), |value| value.span.start)
+    fn definition_start(&mut self, description: Option<&StringValue<'a>>) -> u32 {
+        description.map_or_else(|| self.current_start(), |value| value.span.start)
     }
 
     fn parse_string_value(&mut self) -> Option<StringValue<'a>> {
@@ -1594,7 +1597,8 @@ impl<'a> Parser<'a> {
     }
 
     fn current_span(&mut self) -> Span {
-        self.peek_token().map(token_span).unwrap_or_else(|| Span::new(self.last_end, self.last_end))
+        let end = self.last_end;
+        self.peek_token().map_or_else(|| Span::new(end, end), token_span)
     }
 
     fn span_from(&self, start: u32) -> Span {

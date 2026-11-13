@@ -74,6 +74,7 @@ impl<'a> Lexer<'a> {
         }
     }
 
+    #[must_use]
     pub fn with_limit(mut self, limit: usize) -> Self {
         self.limit_tracker = LimitTracker::new(limit);
         self
@@ -256,12 +257,14 @@ impl<'a> Cursor<'a> {
     }
 
     #[inline]
+    #[expect(clippy::unnecessary_wraps, reason = "keeps the `advance` match arms uniform")]
     fn punctuation(&mut self, mut token: Token<'a>, kind: TokenKind) -> Result<Token<'a>, Error> {
         token.kind = kind;
         token.data = self.current_str();
         Ok(token)
     }
 
+    #[expect(clippy::unnecessary_wraps, reason = "keeps the `advance` match arms uniform")]
     fn lex_comment(&mut self, mut token: Token<'a>) -> Result<Token<'a>, Error> {
         token.kind = TokenKind::Comment;
         let start = self.index;

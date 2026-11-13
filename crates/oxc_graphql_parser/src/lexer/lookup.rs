@@ -4,7 +4,7 @@
 /// lexer would otherwise run for every token start.
 #[derive(Clone, Copy)]
 #[repr(u8)]
-pub(crate) enum ByteClass {
+pub enum ByteClass {
     Other,
     Bang,
     Dollar,
@@ -38,13 +38,13 @@ pub(crate) enum ByteClass {
 static BYTE_CLASS: [ByteClass; 256] = byte_class_lut();
 
 #[inline]
-pub(crate) fn byte_class(c: u8) -> ByteClass {
+pub fn byte_class(c: u8) -> ByteClass {
     BYTE_CLASS[c as usize]
 }
 
 /// <https://spec.graphql.org/October2021/#NameStart>
 #[inline]
-pub(crate) fn is_namestart(c: u8) -> bool {
+pub fn is_namestart(c: u8) -> bool {
     matches!(byte_class(c), ByteClass::Name)
 }
 

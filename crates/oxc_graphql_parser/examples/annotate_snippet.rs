@@ -6,6 +6,8 @@
 //!
 //! [annotate-snippets]: https://docs.rs/annotate-snippets/0.12.0/annotate_snippets/
 
+#![expect(clippy::print_stdout)]
+
 use annotate_snippets::AnnotationKind;
 use annotate_snippets::Level;
 use annotate_snippets::Renderer;

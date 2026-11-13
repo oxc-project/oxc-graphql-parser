@@ -42,6 +42,7 @@ fn are_variables_unused() {
     }
 }
 
+#[expect(clippy::unimplemented, reason = "the example only handles field selections")]
 fn get_variables_from_selection<'a>(
     used_vars: &'a mut Vec<String>,
     selection_set: &ast::SelectionSet<'_>,

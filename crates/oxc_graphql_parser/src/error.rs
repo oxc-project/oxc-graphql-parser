@@ -33,7 +33,7 @@ use std::fmt;
 /// [annotate_snippets]: https://github.com/oxc-project/oxc-graphql-parser/blob/main/crates/oxc_graphql_parser/examples/annotate_snippet.rs
 
 #[derive(PartialEq, Eq, Clone, Hash)]
-pub(crate) enum ErrorData {
+pub enum ErrorData {
     Eof,
     LimitExceeded,
     Text(String),
