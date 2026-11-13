@@ -33,7 +33,7 @@ use std::fmt;
 /// [annotate_snippets]: https://github.com/oxc-project/oxc-graphql-parser/blob/main/crates/oxc_graphql_parser/examples/annotate_snippet.rs
 
 #[derive(PartialEq, Eq, Clone, Hash)]
-pub(crate) enum ErrorData {
+enum ErrorData {
     Eof,
     LimitExceeded,
     Text(String),
@@ -62,7 +62,7 @@ impl fmt::Display for ErrorData {
 #[error("ERROR@{index}:{} {message:?} {data}", .index + .data.len())]
 pub struct Error {
     pub(crate) message: String,
-    pub(crate) data: ErrorData,
+    data: ErrorData,
     pub(crate) index: usize,
 }
 

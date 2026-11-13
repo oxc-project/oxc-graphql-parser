@@ -8,9 +8,7 @@ fn parse_query(query: &str) {
     let parser = oxc_graphql_parser::Parser::new(&allocator, query);
     let tree = parser.parse();
 
-    if tree.errors().len() != 0 {
-        panic!("error parsing query: {:?}", tree.errors());
-    }
+    assert_eq!(tree.errors().len(), 0, "error parsing query: {:?}", tree.errors());
     let document = tree.document();
 
     // Simulate a basic selection set traversal operation.
@@ -43,7 +41,7 @@ fn bench_query_lexer(c: &mut Criterion) {
             for token_res in lexer {
                 std::hint::black_box(token_res.unwrap());
             }
-        })
+        });
     });
 }
 

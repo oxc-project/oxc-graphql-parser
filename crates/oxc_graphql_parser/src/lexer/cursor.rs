@@ -2,7 +2,7 @@ use crate::Error;
 
 /// Byte cursor over GraphQL source text.
 #[derive(Debug)]
-pub(crate) struct Cursor<'a> {
+pub struct Cursor<'a> {
     pub(super) index: usize,
     pub(super) offset: usize,
     pub(super) source: &'a str,
@@ -122,18 +122,15 @@ impl<'a> Cursor<'a> {
     /// of input with the EOF-adjacent index preserved for token-limit
     /// diagnostics (mirroring `current_str`).
     pub(super) fn seek_line_end(&mut self) -> usize {
-        let end = match memchr::memchr2(b'\n', b'\r', &self.bytes[self.next..]) {
-            Some(found) => {
-                let end = self.next + found;
-                self.index = end;
-                end
-            }
-            None => {
-                let end = self.bytes.len();
-                // `end >= 1` because the leading `#` is already consumed.
-                self.index = end - 1;
-                end
-            }
+        let end = if let Some(found) = memchr::memchr2(b'\n', b'\r', &self.bytes[self.next..]) {
+            let end = self.next + found;
+            self.index = end;
+            end
+        } else {
+            let end = self.bytes.len();
+            // `end >= 1` because the leading `#` is already consumed.
+            self.index = end - 1;
+            end
         };
         self.offset = end;
         self.next = end;
@@ -182,6 +179,6 @@ impl<'a> Cursor<'a> {
 
     /// Add error object to the cursor.
     pub(crate) fn add_err(&mut self, err: Error) {
-        self.err = Some(err)
+        self.err = Some(err);
     }
 }

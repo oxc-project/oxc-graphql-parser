@@ -9,9 +9,7 @@ fn parse_schema(schema: &str) {
     let tree = parser.parse();
     let errors = tree.errors().collect::<Vec<_>>();
 
-    if !errors.is_empty() {
-        panic!("error parsing query: {errors:?}");
-    }
+    assert!(errors.is_empty(), "error parsing query: {errors:?}");
 
     let document = tree.document();
 
@@ -43,7 +41,7 @@ fn bench_supergraph_lexer(c: &mut Criterion) {
             for token_res in lexer {
                 std::hint::black_box(token_res.unwrap());
             }
-        })
+        });
     });
 }
 

@@ -34,7 +34,7 @@ type Query {
 
 #[test]
 fn parser_parses_query_variables_and_used_variables() {
-    let source = r#"
+    let source = r"
 query GraphQuery($graph_id: ID!, $variant: String) {
   service(id: $graph_id) {
     schema(tag: $variant) {
@@ -42,7 +42,7 @@ query GraphQuery($graph_id: ID!, $variant: String) {
     }
   }
 }
-"#;
+";
     let allocator = Allocator::default();
     let ast = Parser::new(&allocator, source).parse();
     assert_eq!(ast.errors().len(), 0);
@@ -75,7 +75,7 @@ fn parser_parses_selection_set_and_type_roots() {
 
 #[test]
 fn parser_parses_experimental_fragment_arguments() {
-    let source = r#"
+    let source = r"
 fragment variableProfilePic($size: Int) on User {
   profilePic(size: $size)
 }
@@ -85,7 +85,7 @@ query Q {
     ...variableProfilePic(size: 100)
   }
 }
-"#;
+";
     let allocator = Allocator::default();
     let ast = Parser::new(&allocator, source).experimental_fragment_arguments(true).parse();
     assert_eq!(ast.errors().len(), 0);
@@ -154,7 +154,7 @@ fn parser_rejects_fragment_arguments_without_flag() {
 
 #[test]
 fn parser_collects_comment_spans_in_document_order() {
-    let source = r#"# leading
+    let source = r"# leading
 query Q {
   # inside selection set
   field # trailing
@@ -164,7 +164,7 @@ query Q {
 type T {
   name: String
 }
-# at end of document"#;
+# at end of document";
     let allocator = Allocator::default();
     let ast = Parser::new(&allocator, source).parse();
     assert_eq!(ast.errors().len(), 0);
@@ -238,7 +238,7 @@ fn parser_collects_no_comments_when_absent() {
     let allocator = Allocator::default();
     let ast = Parser::new(&allocator, "type T { name: String }").parse();
     assert_eq!(ast.errors().len(), 0);
-    assert!(ast.comments().is_empty());
+    assert_eq!(ast.comments(), []);
 }
 
 #[test]
@@ -262,12 +262,12 @@ fn parser_collects_comments_for_selection_set_and_type_roots() {
 
     let ty = Parser::new(&allocator, "String").parse_type();
     assert_eq!(ty.errors().len(), 0);
-    assert!(ty.comments().is_empty());
+    assert_eq!(ty.comments(), []);
 }
 
 #[test]
 fn definition_and_selection_spans_match_inner_nodes() {
-    let source = r#"query Q {
+    let source = r"query Q {
   field
   ...spread
   ... on T {
@@ -279,7 +279,7 @@ type T {
 }
 extend type T {
   extra: String
-}"#;
+}";
     let allocator = Allocator::default();
     let ast = Parser::new(&allocator, source).parse();
     assert_eq!(ast.errors().len(), 0);
@@ -444,7 +444,7 @@ fn all_fixture_files_parse_without_panicking() {
 }
 
 #[test]
-#[ignore]
+#[ignore = "needs OXC_GRAPHQL_ECOSYSTEM_REPOS"]
 fn ecosystem_graphql_corpus_has_no_parse_errors() {
     let root = std::env::var_os("OXC_GRAPHQL_ECOSYSTEM_REPOS")
         .map(PathBuf::from)

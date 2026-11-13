@@ -15,7 +15,7 @@ type Query {
 }
 "#;
     let (tokens, errors) = Lexer::new(source).lex();
-    assert!(errors.is_empty());
+    assert_eq!(errors, []);
     assert!(tokens.iter().any(|token| token.kind() == TokenKind::Name && token.data() == "Query"));
 }
 
@@ -62,7 +62,7 @@ type Query {
 }
         "#;
     let (tokens, errors) = Lexer::new(schema).lex();
-    assert!(errors.is_empty());
+    assert_eq!(errors, []);
     assert!(tokens.iter().any(|token| {
         token.kind() == TokenKind::StringValue && token.data() == r#""Y-m-d\\TH:i:sP""#
     }));
@@ -81,7 +81,7 @@ fn token_limit_exact() {
     let lexer = Lexer::new("type Query { a a a a a a a a a }").with_limit(26);
     let (tokens, errors) = lexer.lex();
     assert_eq!(tokens.len(), 26);
-    assert!(errors.is_empty());
+    assert_eq!(errors, []);
 
     let lexer = Lexer::new("type Query { a a a a a a a a a }").with_limit(25);
     let (tokens, errors) = lexer.lex();
@@ -136,7 +136,7 @@ Escape character followed by a quote:
         "#;
 
     let (tokens, errors) = Lexer::new(input).lex();
-    assert!(errors.is_empty());
+    assert_eq!(errors, []);
     // The token data should be literally the source text.
     assert_eq!(
         tokens[1].data(),
@@ -178,12 +178,12 @@ Escape character followed by a quote:
 
 #[test]
 fn unexpected_character() {
-    let schema = r#"
+    let schema = r"
 type Query {
     name: String
 }
 /
-        "#;
+        ";
     let (_, errors) = Lexer::new(schema).lex();
     assert_eq!(errors, &[Error::with_loc("Unexpected character \"/\"", "/".to_string(), 33)]);
 }

@@ -42,5 +42,5 @@ name = "supergraph"
 path = "../../benches/supergraph.rs"
 harness = false
 
-# Opt out of `[workspace.lints]` until its warnings are fixed.
 [lints]
+workspace = true

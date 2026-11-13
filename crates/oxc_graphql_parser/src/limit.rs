@@ -64,7 +64,7 @@ impl LimitTracker {
         if reached {
             cold_path();
             // Caller is gonna return early, keep increments and decrements balanced:
-            self.decrement()
+            self.decrement();
         }
         reached
     }
