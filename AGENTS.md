@@ -37,7 +37,7 @@ Upstream follows spec editions and stops at October 2021; what graphql-js parses
 | `cargo +nightly fuzz run <lexer\|parser\|parser_limited> -- -max_total_time=60` | panic and hang fuzzing (`fuzz/`), needs `cargo-fuzz` |
 | `cargo bench -p oxc-graphql-parser` | parse speed (`benches/`) |
 
-CI (`.github/workflows`) runs check, test, clippy, doc and typos.
+CI (`.github/workflows`) runs check, test, clippy and doc.
 
 - `test_data/{lexer,parser}/{ok,err}/*.graphql` is a corpus:
   each file must lex back to its source when it lexes without errors, and must parse without panicking.
