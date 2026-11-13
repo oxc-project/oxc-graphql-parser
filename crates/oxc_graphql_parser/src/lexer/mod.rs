@@ -215,7 +215,7 @@ impl<'a> Cursor<'a> {
                 }
             }
             ByteClass::Quote => self.lex_string_start(token),
-            ByteClass::Hash => self.lex_comment(token),
+            ByteClass::Hash => Ok(self.lex_comment(token)),
             ByteClass::Dot => self.lex_spread(token),
             ByteClass::Zero => self.lex_number(NumberState::LeadingZero, token),
             ByteClass::Digit => self.lex_number(NumberState::IntegerPart, token),
@@ -257,20 +257,19 @@ impl<'a> Cursor<'a> {
     }
 
     #[inline]
-    #[expect(clippy::unnecessary_wraps, reason = "keeps the `advance` match arms uniform")]
+    #[expect(clippy::unnecessary_wraps, reason = "avoids `Ok(...)` on 14 `advance` arms")]
     fn punctuation(&mut self, mut token: Token<'a>, kind: TokenKind) -> Result<Token<'a>, Error> {
         token.kind = kind;
         token.data = self.current_str();
         Ok(token)
     }
 
-    #[expect(clippy::unnecessary_wraps, reason = "keeps the `advance` match arms uniform")]
-    fn lex_comment(&mut self, mut token: Token<'a>) -> Result<Token<'a>, Error> {
+    fn lex_comment(&mut self, mut token: Token<'a>) -> Token<'a> {
         token.kind = TokenKind::Comment;
         let start = self.index;
         let end = self.seek_line_end();
         token.data = &self.source[start..end];
-        Ok(token)
+        token
     }
 
     fn lex_spread(&mut self, mut token: Token<'a>) -> Result<Token<'a>, Error> {

@@ -8,7 +8,7 @@ fn parse_query(query: &str) {
     let parser = oxc_graphql_parser::Parser::new(&allocator, query);
     let tree = parser.parse();
 
-    assert!(tree.errors().len() == 0, "error parsing query: {:?}", tree.errors());
+    assert_eq!(tree.errors().len(), 0, "error parsing query: {:?}", tree.errors());
     let document = tree.document();
 
     // Simulate a basic selection set traversal operation.
